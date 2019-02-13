@@ -115,12 +115,23 @@ class Game {
 
   draw(canvas) {
     const piece = new _piece__WEBPACK_IMPORTED_MODULE_0__["default"]();
-    this.context.fillStyle = "#000";
-    this.context.fillRect(0, 0, canvas.width, canvas.height);
-
+    const c = this.context;
+    c.clearRect(0, 0, canvas.width, canvas.height);
+    // c.fillStyle = "#000";
+    // c.fillRect(0, 0, canvas.width, canvas.height);
+    
     piece.drawPiece(
-      this.player.matrix, this.player.position, this.context
+      this.player.matrix, this.player.position, c
     );
+
+    c.beginPath();
+    c.lineWidth = "0.001";
+    c.moveTo(1, 0);
+    c.lineTo(0, 600);
+    c.strokeStyle = "white";
+    c.closePath();
+    c.rect(0, 0, 1, 1);
+    c.stroke();
   }
 
   drop(time) {
@@ -197,8 +208,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("canvas");
   const context = canvas.getContext("2d");
 
-  canvas.width = 400;
-  canvas.height = 600;
+  canvas.width = 391;
+  canvas.height = 601;
 
   context.scale(30, 30);
 
@@ -318,6 +329,13 @@ class Piece {
         if (value !== 0) {
           context.fillStyle = COLORS[value];
           context.fillRect(x + offset.x, y + offset.y, 1, 1);
+          // context.beginPath();
+          // context.lineWidth = "0.01";
+          // context.moveTo(offset.x, offset.y + 1);
+          // context.lineTo(5, 5);
+          // context.strokeStyle = "white";
+          // context.closePath();
+          // context.stroke();
         }
       });
     });

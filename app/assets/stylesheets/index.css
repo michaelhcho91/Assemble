@@ -1,0 +1,14 @@
+.game-container {
+  display: flex;
+  justify-content: center;
+}
+
+#canvas {
+  /* background-color: "black"; */
+  /* background-image: url(""); */
+  /* background-repeat: no-repeat; */
+  background: #000;
+  background-image: linear-gradient(red .08em, transparent .08em), 
+                    linear-gradient(90deg, red .08em, transparent .08em);
+  background-size: 1.875em 1.875em;
+}
