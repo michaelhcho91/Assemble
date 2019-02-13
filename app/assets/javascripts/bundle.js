@@ -86,26 +86,267 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./lib/game.js":
+/*!*********************!*\
+  !*** ./lib/game.js ***!
+  \*********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _piece__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./piece */ "./lib/piece.js");
+/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./player */ "./lib/player.js");
+
+
+
+class Game {
+  constructor(player, context) {
+    this.player = player;
+    this.context = context;
+
+    this.lastTime = 0;
+    this.dropCounter = 0;
+    this.dropInterval = 1000;
+
+    this.drop = this.drop.bind(this);
+    this.draw = this.draw.bind(this);
+  }
+
+  draw(canvas) {
+    const piece = new _piece__WEBPACK_IMPORTED_MODULE_0__["default"]();
+    this.context.fillStyle = "#000";
+    this.context.fillRect(0, 0, canvas.width, canvas.height);
+
+    piece.drawPiece(
+      this.player.matrix, this.player.position, this.context
+    );
+  }
+
+  drop(time) {
+    const deltaTime = time - this.lastTime;
+    this.lastTime = time;
+    this.dropCounter += deltaTime;
+
+    if (this.dropCounter > this.dropInterval) {
+      this.player.position.y++;
+      this.dropCounter = 0;
+    }
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Game);
+
+/***/ }),
+
+/***/ "./lib/game_view.js":
+/*!**************************!*\
+  !*** ./lib/game_view.js ***!
+  \**************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _piece__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./piece */ "./lib/piece.js");
+
+
+class GameView {
+  constructor(game, canvas) {
+    this.game = game;
+    this.canvas = canvas;
+
+    this.update = this.update.bind(this);
+    this.drawBoard = this.drawBoard.bind(this);
+  }
+
+  drawBoard(canvas) {
+    this.game.draw(canvas);
+  }
+
+  update(time = 0) {
+    this.game.drop(time);
+    this.drawBoard(this.canvas);
+    requestAnimationFrame(this.update);
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (GameView);
+
+/***/ }),
+
 /***/ "./lib/index.js":
 /*!**********************!*\
   !*** ./lib/index.js ***!
   \**********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./player */ "./lib/player.js");
+/* harmony import */ var _game__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./game */ "./lib/game.js");
+/* harmony import */ var _game_view__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./game_view */ "./lib/game_view.js");
+/* harmony import */ var _piece__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./piece */ "./lib/piece.js");
+
+
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
+  const context = canvas.getContext("2d");
 
-  canvas.width = 900;
-  canvas.height = 900;
+  canvas.width = 400;
+  canvas.height = 600;
 
-  // // test for shape outline
-  // ctx.fillStyle = "#000";
-  // ctx.fillRect(20, 20, 150, 100);
-  // ctx.strokeStyle = "red";
-  // ctx.strokeRect(20, 20, 150, 100);
+  context.scale(30, 30);
+
+  const matrix = new _piece__WEBPACK_IMPORTED_MODULE_3__["default"]().createPiece("L");
+  const player = new _player__WEBPACK_IMPORTED_MODULE_0__["default"](
+    { x: 3, y: 3 },
+    matrix
+  );
+  const game = new _game__WEBPACK_IMPORTED_MODULE_1__["default"](
+    player,
+    context
+  );
+  const gameView = new _game_view__WEBPACK_IMPORTED_MODULE_2__["default"](game, canvas);
+
+
+  gameView.update();
 });
+
+/***/ }),
+
+/***/ "./lib/piece.js":
+/*!**********************!*\
+  !*** ./lib/piece.js ***!
+  \**********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+const COLORS = [
+  null,
+  "#167F39",
+  "#DE264C",
+  "#0074D9",
+  "#FA5B0F",
+  "#FFDC00",
+  "#D40D12",
+  "#25064C",
+  "#63A69F",
+  "#F2E1AC",
+  "#F2836B"
+];
+
+class Piece {
+  constructor() {
+    this.createPiece = this.createPiece.bind(this);
+    this.drawPiece = this.drawPiece.bind(this);
+  }
+
+  createPiece(shape) {
+    switch (shape) {
+      case "T":
+        return [
+          [0, 0, 0],
+          [1, 1, 1],
+          [0, 1, 0]
+        ];
+      case "O":
+        return [
+          [2, 2],
+          [2, 2]
+        ];
+      case "L":
+        return [
+          [0, 3, 0],
+          [0, 3, 0],
+          [0, 3, 3]
+        ];
+      case "J":
+        return [
+          [0, 4, 0],
+          [0, 4, 0],
+          [4, 4, 0]
+        ];
+      case "I":
+        return [
+          [0, 5, 0, 0],
+          [0, 5, 0, 0],
+          [0, 5, 0, 0],
+          [0, 5, 0, 0]
+        ];
+      case "S":
+        return [
+          [0, 6, 6],
+          [6, 6, 0],
+          [0, 0, 0]
+        ];
+      case "Z":
+        return [
+          [7, 7, 0],
+          [0, 7, 7],
+          [0, 0, 0]
+        ];
+      case "1":
+        return [
+          [8]
+        ];
+      case "2":
+        return [
+          [9, 0],
+          [0, 9]
+        ];
+      case "3":
+        return [
+          [10, 0, 0],
+          [0, 10, 0],
+          [0, 0, 10]
+        ];
+      default:
+        break;
+    }
+  }
+
+  drawPiece(matrix, offset, context) {
+    matrix.forEach((row, y) => {
+      row.forEach((value, x) => {
+        if (value !== 0) {
+          context.fillStyle = COLORS[value];
+          context.fillRect(x + offset.x, y + offset.y, 1, 1);
+        }
+      });
+    });
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Piece);
+
+/***/ }),
+
+/***/ "./lib/player.js":
+/*!***********************!*\
+  !*** ./lib/player.js ***!
+  \***********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+class Player {
+  constructor(position, matrix) {
+    this.position = position;
+    this.matrix = matrix;
+  }
+
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Player);
 
 /***/ })
 
