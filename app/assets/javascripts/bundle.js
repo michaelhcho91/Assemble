@@ -110,9 +110,9 @@ class Game {
     this.dropInterval = 1000;
     this.board = this.createBoard(12, 20);
 
-    this.drop = this.drop.bind(this);
+    this.autoDrop = this.autoDrop.bind(this);
     this.draw = this.draw.bind(this);
-    this.playerDrop = this.playerDrop.bind(this);
+    this.manualDrop = this.manualDrop.bind(this);
     this.isCollided = this.isCollided.bind(this);
     this.mergeMatrix = this.mergeMatrix.bind(this);
   }
@@ -126,11 +126,11 @@ class Game {
     const c = this.context;
     c.clearRect(0, 0, canvas.width, canvas.height);
     
-    this.player.drawMatrix(
+    this.player.drawMatrix( // player (piece)
       this.player.matrix, this.player.position, c
     );
 
-    this.player.drawMatrix(
+    this.player.drawMatrix( // board
       this.board, {x: 0, y: 0}, c
     );
   }
@@ -161,7 +161,7 @@ class Game {
     return false;
   }
   
-  playerDrop() {
+  manualDrop() {
     this.player.position.y++;
 
     if (this.isCollided(this.board, this.player)) {
@@ -174,13 +174,13 @@ class Game {
     this.dropCounter = 0;
   }
 
-  drop(time) {
+  autoDrop(time) {
     const deltaTime = time - this.lastTime;
     this.lastTime = time;
     this.dropCounter += deltaTime;
 
     if (this.dropCounter > this.dropInterval) {
-      this.playerDrop();
+      this.manualDrop();
     }
   }
 
@@ -226,7 +226,7 @@ class GameView {
   }
 
   update(time = 0) {
-    this.game.drop(time);
+    this.game.autoDrop(time);
     this.drawBoard(this.canvas);
     requestAnimationFrame(this.update);
   }
@@ -244,8 +244,9 @@ class GameView {
           break;
         case 40:
         case 83:
-          this.game.playerDrop();
+          this.game.manualDrop();
           break;
+        case 16:
         case 38:
         case 87:
           // up for rotate
@@ -336,7 +337,7 @@ class Piece {
   constructor() {
     this.createPiece = this.createPiece.bind(this);
   }
-
+  
   createPiece() {
     const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
 

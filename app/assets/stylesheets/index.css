@@ -1,14 +1,13 @@
 body {
-  background-color: grey;
-  /* display: flex;
-  align-content: center; */
+  background-color: cornflowerblue;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
 }
 
 .game-container {
   display: flex;
-  justify-content: center;
   align-items: center;
-  /* background-color: green; */
 }
 
 #canvas {
