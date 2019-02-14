@@ -111,6 +111,7 @@ class Game {
 
     this.drop = this.drop.bind(this);
     this.draw = this.draw.bind(this);
+    this.playerDrop = this.playerDrop.bind(this);
   }
 
   draw(canvas) {
@@ -123,15 +124,11 @@ class Game {
     piece.drawPiece(
       this.player.matrix, this.player.position, c
     );
+  }
 
-    c.beginPath();
-    c.lineWidth = "0.001";
-    c.moveTo(1, 0);
-    c.lineTo(0, 600);
-    c.strokeStyle = "white";
-    c.closePath();
-    c.rect(0, 0, 1, 1);
-    c.stroke();
+  playerDrop() {
+    this.player.position.y++;
+    this.dropCounter = 0;
   }
 
   drop(time) {
@@ -140,8 +137,7 @@ class Game {
     this.dropCounter += deltaTime;
 
     if (this.dropCounter > this.dropInterval) {
-      this.player.position.y++;
-      this.dropCounter = 0;
+      this.playerDrop();
     }
   }
 }
@@ -169,6 +165,7 @@ class GameView {
 
     this.update = this.update.bind(this);
     this.drawBoard = this.drawBoard.bind(this);
+    this.bindControls = this.bindControls.bind(this);
   }
 
   drawBoard(canvas) {
@@ -179,6 +176,25 @@ class GameView {
     this.game.drop(time);
     this.drawBoard(this.canvas);
     requestAnimationFrame(this.update);
+  }
+
+  bindControls() {
+    document.addEventListener("keydown", (e) => {
+      switch (e.keyCode) {
+        case 37:
+          this.game.player.position.x--;
+          break;
+        case 39:
+          this.game.player.position.x++;
+          break;
+        case 40:
+          this.game.playerDrop();
+          break;
+        
+        default:
+          break;
+      }
+    });
   }
 }
 
@@ -208,8 +224,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("canvas");
   const context = canvas.getContext("2d");
 
-  canvas.width = 391;
-  canvas.height = 601;
+  canvas.width = 360;
+  canvas.height = 600;
 
   context.scale(30, 30);
 
@@ -224,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   const gameView = new _game_view__WEBPACK_IMPORTED_MODULE_2__["default"](game, canvas);
 
-
+  gameView.bindControls();
   gameView.update();
 });
 
@@ -329,13 +345,6 @@ class Piece {
         if (value !== 0) {
           context.fillStyle = COLORS[value];
           context.fillRect(x + offset.x, y + offset.y, 1, 1);
-          // context.beginPath();
-          // context.lineWidth = "0.01";
-          // context.moveTo(offset.x, offset.y + 1);
-          // context.lineTo(5, 5);
-          // context.strokeStyle = "white";
-          // context.closePath();
-          // context.stroke();
         }
       });
     });
