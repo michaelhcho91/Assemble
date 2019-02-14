@@ -117,6 +117,11 @@ class Game {
     this.mergeMatrix = this.mergeMatrix.bind(this);
   }
 
+  start(gameView) {
+    gameView.bindControls();
+    gameView.update();
+  }
+
   draw(canvas) {
     const c = this.context;
     c.clearRect(0, 0, canvas.width, canvas.height);
@@ -163,6 +168,7 @@ class Game {
       this.player.position.y--;
       this.mergeMatrix(this.board, this.player);
       this.player.position.y = 0;
+      this.player.position.x = 4;
     }
 
     this.dropCounter = 0;
@@ -229,15 +235,24 @@ class GameView {
     document.addEventListener("keydown", (e) => {
       switch (e.keyCode) {
         case 37:
+        case 65:
           this.game.player.position.x--;
           break;
         case 39:
+        case 68:
           this.game.player.position.x++;
           break;
         case 40:
+        case 83:
           this.game.playerDrop();
           break;
-        
+        case 38:
+        case 87:
+          // up for rotate
+          break;
+        case 32:
+          // space for hard drop
+          break;
         default:
           break;
       }
@@ -278,7 +293,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const matrix = new _piece__WEBPACK_IMPORTED_MODULE_3__["default"]().createPiece("L");
   const player = new _player__WEBPACK_IMPORTED_MODULE_0__["default"](
-    { x: 3, y: 3 },
+    { x: 4, y: 0 },
     matrix
   );
   const game = new _game__WEBPACK_IMPORTED_MODULE_1__["default"](
@@ -287,8 +302,21 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   const gameView = new _game_view__WEBPACK_IMPORTED_MODULE_2__["default"](game, canvas);
 
-  gameView.bindControls();
-  gameView.update();
+  document.addEventListener("keydown", (e) => {
+    switch (e.keyCode) {
+      case 32:
+        game.start(gameView);
+        break;
+      case 80:
+        // p for pause
+        break;
+      case 77:
+        // m for mute
+        break;
+      default:
+        break;
+    }
+  });
 });
 
 /***/ }),
