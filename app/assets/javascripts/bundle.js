@@ -108,26 +108,63 @@ class Game {
     this.lastTime = 0;
     this.dropCounter = 0;
     this.dropInterval = 1000;
+    this.board = this.createBoard(12, 20);
 
     this.drop = this.drop.bind(this);
     this.draw = this.draw.bind(this);
     this.playerDrop = this.playerDrop.bind(this);
+    this.isCollided = this.isCollided.bind(this);
+    this.mergeMatrix = this.mergeMatrix.bind(this);
   }
 
   draw(canvas) {
-    const piece = new _piece__WEBPACK_IMPORTED_MODULE_0__["default"]();
     const c = this.context;
     c.clearRect(0, 0, canvas.width, canvas.height);
-    // c.fillStyle = "#000";
-    // c.fillRect(0, 0, canvas.width, canvas.height);
     
-    piece.drawPiece(
+    this.player.drawMatrix(
       this.player.matrix, this.player.position, c
+    );
+
+    this.player.drawMatrix(
+      this.board, {x: 0, y: 0}, c
     );
   }
 
+  createBoard(width, height) {
+    const board = [];
+
+    while (height--) {
+      board.push(
+        new Array(width).fill(0)
+      );
+    }
+
+    return board;
+  }
+  
+  isCollided(board, player) {
+    const [matrix, offset] = [player.matrix, player.position];
+
+    for (let y = 0; y < matrix.length; y++) {
+      for (let x = 0; x < matrix[y].length; x++) {
+        if (matrix[y][x] !== 0 && (board[y + offset.y] && board[y + offset.y][x + offset.x]) !== 0) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+  
   playerDrop() {
     this.player.position.y++;
+
+    if (this.isCollided(this.board, this.player)) {
+      this.player.position.y--;
+      this.mergeMatrix(this.board, this.player);
+      this.player.position.y = 0;
+    }
+
     this.dropCounter = 0;
   }
 
@@ -139,6 +176,16 @@ class Game {
     if (this.dropCounter > this.dropInterval) {
       this.playerDrop();
     }
+  }
+
+  mergeMatrix(board, player) {
+    player.matrix.forEach((row, y) => {
+      row.forEach((value, x) => {
+        if (value !== 0) {
+          board[y + player.position.y][x + player.position.x] = value;
+        }
+      });
+    });
   }
 }
 
@@ -255,24 +302,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-const COLORS = [
-  null,
-  "#167F39",
-  "#DE264C",
-  "#0074D9",
-  "#FA5B0F",
-  "#FFDC00",
-  "#D40D12",
-  "#25064C",
-  "#63A69F",
-  "#F2E1AC",
-  "#F2836B"
-];
-
 class Piece {
   constructor() {
     this.createPiece = this.createPiece.bind(this);
-    this.drawPiece = this.drawPiece.bind(this);
   }
 
   createPiece(shape) {
@@ -338,17 +370,6 @@ class Piece {
         break;
     }
   }
-
-  drawPiece(matrix, offset, context) {
-    matrix.forEach((row, y) => {
-      row.forEach((value, x) => {
-        if (value !== 0) {
-          context.fillStyle = COLORS[value];
-          context.fillRect(x + offset.x, y + offset.y, 1, 1);
-        }
-      });
-    });
-  }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Piece);
@@ -364,13 +385,38 @@ class Piece {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+const COLORS = [
+  null,
+  "#167F39",
+  "#DE264C",
+  "#0074D9",
+  "#FA5B0F",
+  "#FFDC00",
+  "#D40D12",
+  "#25064C",
+  "#63A69F",
+  "#F2E1AC",
+  "#F2836B"
+];
+
 class Player {
   constructor(position, matrix) {
     this.position = position;
     this.matrix = matrix;
+
+    this.drawMatrix = this.drawMatrix.bind(this);
   }
 
-
+  drawMatrix(matrix, offset, context) {
+    matrix.forEach((row, y) => {
+      row.forEach((value, x) => {
+        if (value !== 0) {
+          context.fillStyle = COLORS[value];
+          context.fillRect(x + offset.x, y + offset.y, 1, 1);
+        }
+      });
+    });
+  }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Player);
