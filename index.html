@@ -5,11 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Tetris</title>
-  <link rel="stylesheet" href="app/assets/stylesheets/index.css">
   <script src="app/assets/javascripts/bundle.js"></script>
+  <link rel="stylesheet" href="app/assets/stylesheets/index.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+    integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
 </head>
 <body>
   <section class="game-container">
+    <article class="title">
+      <h1>Title</h1>
+      <ul class="links-list">
+        <li><a href="https://github.com/michaelhcho91" target="_blank"><i class="fab fa-github-alt"></i></a></li>
+        <li><a href="https://www.linkedin.com/in/michael-cho-48a820146/" target="_blank"><i class="fab fa-linkedin-in"></i></a></li>
+        <li><a href="https://angel.co/michael-cho-16?public_profile=1" target="_blank"><i class="fab fa-angellist"></i></a></li>
+        <li><a href="https://michaelhcho.com/" target="_blank"><i class="fas fa-user-alt"></i></a></li>
+      </ul>
+    </article>
     <canvas id="canvas"></canvas>
     <article class="instructions-score">
       <div>Score:</div>
@@ -17,7 +29,8 @@
       <br />
       <span>Press SPACE to start!</span>
       <p>
-        LEFT & RIGHT = move horizontally
+        <img class="arrow-controls" src="./app/assets/images/arrow_controls.png">
+        LEFT & RIGHT = move
         <br />
         UP = rotate
         <br />

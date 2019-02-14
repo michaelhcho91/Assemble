@@ -291,7 +291,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   context.scale(30, 30);
 
-  const matrix = new _piece__WEBPACK_IMPORTED_MODULE_3__["default"]().createPiece("L");
+  const matrix = new _piece__WEBPACK_IMPORTED_MODULE_3__["default"]().createPiece();
   const player = new _player__WEBPACK_IMPORTED_MODULE_0__["default"](
     { x: 4, y: 0 },
     matrix
@@ -330,12 +330,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+const SHAPES = "IJLSZOTIJLSZOTIJLSZOT123";
+
 class Piece {
   constructor() {
     this.createPiece = this.createPiece.bind(this);
   }
 
-  createPiece(shape) {
+  createPiece() {
+    const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+
     switch (shape) {
       case "T":
         return [
@@ -415,16 +419,16 @@ class Piece {
 __webpack_require__.r(__webpack_exports__);
 const COLORS = [
   null,
-  "#167F39",
-  "#DE264C",
-  "#0074D9",
-  "#FA5B0F",
-  "#FFDC00",
-  "#D40D12",
-  "#25064C",
-  "#63A69F",
-  "#F2E1AC",
-  "#F2836B"
+  "#5E0000",
+  "#275610",
+  "#1436BE",
+  "#E4D94C",
+  "#640063",
+  "#79191A",
+  "#5B3216",
+  "#E5DA4D",
+  "#E3E3E3",
+  "#685326"
 ];
 
 class Player {

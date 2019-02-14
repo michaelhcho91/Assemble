@@ -1,25 +1,56 @@
 body {
-  background-color: black;
+  background-color: grey;
+  /* display: flex;
+  align-content: center; */
 }
 
 .game-container {
   display: flex;
   justify-content: center;
-  background-color: green;
+  align-items: center;
+  /* background-color: green; */
 }
 
 #canvas {
   background: #000;
-  background-image: linear-gradient(red .08em, transparent .08em), 
-                    linear-gradient(90deg, red .08em, transparent .08em);
+  background-image: linear-gradient(white .08em, transparent .08em), 
+                    linear-gradient(90deg, white .08em, transparent .08em);
   background-size: 1.875em 1.875em;
-  border: 10px solid white;
+  border: 10px solid silver;
 }
 
 .instructions-score {
   margin-left: 100px;
+  width: 200px;
+}
+
+.arrow-controls {
+  width: 200px;
 }
 
 /* #score {
   background-color: red;
 } */
+
+.title {
+  margin-right: 100px;
+  width: 200px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.title h1 {
+  font-size: 30px;
+}
+
+.links-list li {
+  list-style: none;
+  font-size: 60px;
+  margin-bottom: 20px;
+}
+
+.links-list a {
+  text-decoration: none;
+  color: black;
+}
