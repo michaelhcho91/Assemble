@@ -113,13 +113,30 @@ class Game {
     this.autoDrop = this.autoDrop.bind(this);
     this.draw = this.draw.bind(this);
     this.manualDrop = this.manualDrop.bind(this);
-    this.isCollided = this.isCollided.bind(this);
-    this.mergeMatrix = this.mergeMatrix.bind(this);
+    this.moveLat = this.moveLat.bind(this);
+    this.playerRotate = this.playerRotate.bind(this);
   }
 
-  start(gameView) {
-    gameView.bindControls();
-    gameView.update();
+  autoDrop(time) {
+    const deltaTime = time - this.lastTime;
+    this.lastTime = time;
+    this.dropCounter += deltaTime;
+
+    if (this.dropCounter > this.dropInterval) {
+      this.manualDrop();
+    }
+  }
+
+  createBoard(width, height) {
+    const board = [];
+
+    while (height--) { // while truthy, decrement
+      board.push(
+        new Array(width).fill(0)
+      );
+    }
+
+    return board;
   }
 
   draw(canvas) {
@@ -135,18 +152,6 @@ class Game {
     );
   }
 
-  createBoard(width, height) {
-    const board = [];
-
-    while (height--) {
-      board.push(
-        new Array(width).fill(0)
-      );
-    }
-
-    return board;
-  }
-  
   isCollided(board, player) {
     const [matrix, offset] = [player.matrix, player.position];
 
@@ -160,7 +165,7 @@ class Game {
 
     return false;
   }
-  
+
   manualDrop() {
     this.player.position.y++;
 
@@ -174,16 +179,6 @@ class Game {
     this.dropCounter = 0;
   }
 
-  autoDrop(time) {
-    const deltaTime = time - this.lastTime;
-    this.lastTime = time;
-    this.dropCounter += deltaTime;
-
-    if (this.dropCounter > this.dropInterval) {
-      this.manualDrop();
-    }
-  }
-
   mergeMatrix(board, player) {
     player.matrix.forEach((row, y) => {
       row.forEach((value, x) => {
@@ -192,6 +187,55 @@ class Game {
         }
       });
     });
+  }
+
+  moveLat(direction) {
+    this.player.position.x += direction;
+
+    if (this.isCollided(this.board, this.player)) {
+      this.player.position.x -= direction;
+    }
+  }
+
+  playerRotate(direction) {
+    this.rotate(this.player.matrix, direction);
+    
+    const currentPosition = this.player.position.x;
+    let offset = 1;
+    while (this.isCollided(this.board, this.player)) {
+      this.player.position.x += offset;
+
+      if (offset > 0) {
+        offset = -offset + 1;
+      } else {
+        offset = -offset + -1;
+      }
+
+      if (offset > this.player.matrix[0].length) {
+        this.rotate(this.player.matrix, -direction);
+        this.player.position.x = currentPosition;
+        return;
+      }
+    }
+  }
+  
+  rotate(matrix, direction) {
+    for(let y = 0; y < matrix.length; y++) {
+      for (let x = 0; x < y; x++) {
+        [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
+      }
+    }
+
+    if (direction > 0) {
+      matrix.forEach(row => row.reverse());
+    } else {
+      matrix.reverse();
+    }
+  }
+
+  start(gameView) {
+    gameView.bindControls();
+    gameView.update();
   }
 }
 
@@ -216,9 +260,9 @@ class GameView {
     this.game = game;
     this.canvas = canvas;
 
-    this.update = this.update.bind(this);
-    this.drawBoard = this.drawBoard.bind(this);
     this.bindControls = this.bindControls.bind(this);
+    this.drawBoard = this.drawBoard.bind(this);
+    this.update = this.update.bind(this);
   }
 
   drawBoard(canvas) {
@@ -226,32 +270,32 @@ class GameView {
   }
 
   update(time = 0) {
-    this.game.autoDrop(time);
     this.drawBoard(this.canvas);
+    this.game.autoDrop(time);
     requestAnimationFrame(this.update);
   }
 
   bindControls() {
     document.addEventListener("keydown", (e) => {
       switch (e.keyCode) {
-        case 37:
-        case 65:
-          this.game.player.position.x--;
+        case 37: // left
+        case 65: // A
+          this.game.moveLat(-1);
           break;
-        case 39:
-        case 68:
-          this.game.player.position.x++;
+        case 39: // right
+        case 68: // D
+          this.game.moveLat(1);
           break;
-        case 40:
-        case 83:
+        case 40: // down
+        case 83: // S
           this.game.manualDrop();
           break;
-        case 16:
-        case 38:
-        case 87:
-          // up for rotate
+        case 16: // SHIFT
+        case 38: // up
+        case 87: // W
+          this.game.playerRotate(-1);
           break;
-        case 32:
+        case 32: // space
           // space for hard drop
           break;
         default:
@@ -289,7 +333,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   canvas.width = 360;
   canvas.height = 600;
-
   context.scale(30, 30);
 
   const matrix = new _piece__WEBPACK_IMPORTED_MODULE_3__["default"]().createPiece();
@@ -301,11 +344,14 @@ document.addEventListener("DOMContentLoaded", () => {
     player,
     context
   );
-  const gameView = new _game_view__WEBPACK_IMPORTED_MODULE_2__["default"](game, canvas);
+  const gameView = new _game_view__WEBPACK_IMPORTED_MODULE_2__["default"](
+    game,
+    canvas
+  );
 
   document.addEventListener("keydown", (e) => {
     switch (e.keyCode) {
-      case 32:
+      case 32: // space to start
         game.start(gameView);
         break;
       case 80:
@@ -331,7 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-const SHAPES = "IJLSZOTIJLSZOTIJLSZOT123";
+const SHAPES = "IJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOT12323";
 
 class Piece {
   constructor() {
