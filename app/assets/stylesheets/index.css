@@ -21,11 +21,11 @@ body {
 }
 
 #canvas {
-  border: 10px solid silver;
+  border: 10px solid #142143;
 }
 
 #next-piece {
-  border: 5px solid silver;
+  border: 5px solid #BECEEF;
   margin-bottom: 20px;
 }
 
@@ -52,7 +52,8 @@ body {
 
 #score {
   font-size: 20px;
-  color: white;
+  /* color: #BECEEF; */
+  color: #142143;
 }
 
 .title {
@@ -70,6 +71,5 @@ body {
 
 .links-list a {
   text-decoration: none;
-  color: white;
-  /* color: #DE0500; */
+  color: #BECEEF;
 }

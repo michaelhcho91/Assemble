@@ -119,7 +119,19 @@ class Game {
   }
 
   autoDrop(time = 0) {
-    if (this.paused) return;
+    const ctx = this.context;
+
+    if (this.paused) {
+      // ctx.font = "1.5px Georgia";
+      // ctx.strokeStyle = "black";
+      // ctx.lineWidth = 0.2;
+      // ctx.strokeText("Paused", 1, 6);
+
+      // ctx.font = "1.5px Georgia";
+      // ctx.fillStyle = 0.2;
+      // ctx.fillText("Paused", 1, 6);
+      return;
+    }
     
     const deltaTime = time - this.lastTime;
     this.lastTime = time;
@@ -334,7 +346,7 @@ class GameView {
       g.autoDrop(time);
     } else {
       g.context.font = "1.5px Georgia";
-      g.context.strokeStyle = "black";
+      g.context.strokeStyle = "#142143";
       g.context.lineWidth = 0.2;
       g.context.strokeText("Game Over!", 1, 6);
       
@@ -602,13 +614,13 @@ class Player {
     matrix.forEach((row, y) => {
       row.forEach((value, x) => {
         if (value !== 0) { // color pieces
-          context.strokeStyle = "white";
+          context.strokeStyle = "#BECEEF";
           context.lineWidth = 0.04;
           context.strokeRect(x + position.x, y + position.y, 1, 1);
           context.fillStyle = COLORS[value];
           context.fillRect(x + position.x, y + position.y, 1, 1);
         } else if (value === 0) { // draw board grid
-          context.strokeStyle = "white";
+          context.strokeStyle = "#BECEEF";
           context.lineWidth = 0.04;
           context.strokeRect(x + position.x, y + position.y, 1, 1);
         }
