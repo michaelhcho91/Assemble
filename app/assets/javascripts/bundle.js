@@ -278,16 +278,15 @@ class Game {
   }
 
   start(gameView) {
-    this.context.clearRect(0, 0, canvas.width, canvas.height);
-
     gameView.bindControls();
-    debugger
+
     if (!this.gameOver) {
-      debugger
-      gameView.update();
+      this.board = this.createBoard(10, 20);
       
       this.gameOver = false;
       this.isPlaying = true;
+      
+      gameView.update();
     }
 
     // if (this.player.score >= 200) { // increase difficulty
@@ -327,7 +326,8 @@ class GameView {
     if (g.paused) return;
 
     if (!g.gameOver) {
-      debugger
+      g.context.clearRect(0, 0, canvas.width, canvas.height);
+
       this.drawBoard();
       g.autoDrop(time);
     } else {
