@@ -96,8 +96,6 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _piece__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./piece */ "./lib/piece.js");
-/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./player */ "./lib/player.js");
-
 
 
 class Game {
@@ -105,16 +103,12 @@ class Game {
     this.player = player;
     this.context = context;
 
-    this.lastTime = 0;
+    this.board = this.createBoard(10, 20);
     this.dropCounter = 0;
-    this.dropInterval = 1000;
-    this.board = this.createBoard(12, 20);
-
-    this.autoDrop = this.autoDrop.bind(this);
-    this.draw = this.draw.bind(this);
-    this.manualDrop = this.manualDrop.bind(this);
-    this.moveLat = this.moveLat.bind(this);
-    this.playerRotate = this.playerRotate.bind(this);
+    this.dropInterval = 700;
+    this.gameOver = false;
+    this.lastTime = 0;
+    this.paused = false;
   }
 
   autoDrop(time) {
@@ -143,21 +137,48 @@ class Game {
     const c = this.context;
     c.clearRect(0, 0, canvas.width, canvas.height);
     
-    this.player.drawMatrix( // player (piece)
-      this.player.matrix, this.player.position, c
-    );
-
     this.player.drawMatrix( // board
       this.board, {x: 0, y: 0}, c
     );
+    
+    this.player.drawMatrix( // player (piece)
+      this.player.matrix, this.player.position, c
+    );
   }
 
+  generateNext() {
+    const piece = new _piece__WEBPACK_IMPORTED_MODULE_0__["default"]();
+    const SHAPES = "IJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOT123";
+    const shape = SHAPES[
+      Math.floor(SHAPES.length * Math.random())
+    ];
+
+    this.player.matrix = piece.createPiece(shape);
+    this.player.position.y = 0;
+    this.player.position.x = 3;
+
+    if (this.isCollided(this.board, this.player)) {
+      this.gameOver = true;
+      this.board.forEach(row => row.fill(0));
+      // render game over screen
+    }
+  }
+  
+  // hardDrop() {
+  //   while (!this.isCollided(this.board, this.player)) {
+  //     this.manualDrop();
+  //   }
+  // }
+  
   isCollided(board, player) {
-    const [matrix, offset] = [player.matrix, player.position];
+    const [matrix, position] = [player.matrix, player.position];
 
     for (let y = 0; y < matrix.length; y++) {
       for (let x = 0; x < matrix[y].length; x++) {
-        if (matrix[y][x] !== 0 && (board[y + offset.y] && board[y + offset.y][x + offset.x]) !== 0) {
+        const pieceEdge = matrix[y][x];
+        const boardEdge = (board[y + position.y] && board[y + position.y][x + position.x]);
+
+        if (pieceEdge !== 0 && boardEdge !== 0) {
           return true;
         }
       }
@@ -172,8 +193,7 @@ class Game {
     if (this.isCollided(this.board, this.player)) {
       this.player.position.y--;
       this.mergeMatrix(this.board, this.player);
-      this.player.position.y = 0;
-      this.player.position.x = 4;
+      this.generateNext();
     }
 
     this.dropCounter = 0;
@@ -192,26 +212,26 @@ class Game {
   moveLat(direction) {
     this.player.position.x += direction;
 
-    if (this.isCollided(this.board, this.player)) {
+    if (this.isCollided(this.board, this.player)) { // check wall collision
       this.player.position.x -= direction;
     }
   }
 
   playerRotate(direction) {
     this.rotate(this.player.matrix, direction);
-    
     const currentPosition = this.player.position.x;
-    let offset = 1;
-    while (this.isCollided(this.board, this.player)) {
-      this.player.position.x += offset;
+    let position = 1;
 
-      if (offset > 0) {
-        offset = -offset + 1;
+    while (this.isCollided(this.board, this.player)) {
+      this.player.position.x += position;
+
+      if (position > 0) {
+        position = -position + 1;
       } else {
-        offset = -offset + -1;
+        position = -position + -1;
       }
 
-      if (offset > this.player.matrix[0].length) {
+      if (position > this.player.matrix[0].length) {
         this.rotate(this.player.matrix, -direction);
         this.player.position.x = currentPosition;
         return;
@@ -222,7 +242,7 @@ class Game {
   rotate(matrix, direction) {
     for(let y = 0; y < matrix.length; y++) {
       for (let x = 0; x < y; x++) {
-        [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
+        [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]]; // transpose
       }
     }
 
@@ -236,6 +256,10 @@ class Game {
   start(gameView) {
     gameView.bindControls();
     gameView.update();
+
+    // if (this.player.score >= 200) { // increase difficulty
+    //   this.dropInterval -= 100;
+    // }
   }
 }
 
@@ -252,16 +276,11 @@ class Game {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _piece__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./piece */ "./lib/piece.js");
-
-
 class GameView {
   constructor(game, canvas) {
     this.game = game;
     this.canvas = canvas;
 
-    this.bindControls = this.bindControls.bind(this);
-    this.drawBoard = this.drawBoard.bind(this);
     this.update = this.update.bind(this);
   }
 
@@ -280,22 +299,28 @@ class GameView {
       switch (e.keyCode) {
         case 37: // left
         case 65: // A
+          e.preventDefault();
           this.game.moveLat(-1);
           break;
         case 39: // right
         case 68: // D
+          e.preventDefault();
           this.game.moveLat(1);
           break;
         case 40: // down
         case 83: // S
+          e.preventDefault();
           this.game.manualDrop();
           break;
         case 16: // SHIFT
         case 38: // up
         case 87: // W
+          e.preventDefault();
           this.game.playerRotate(-1);
           break;
         case 32: // space
+          e.preventDefault();
+          // this.game.hardDrop();
           // space for hard drop
           break;
         default:
@@ -331,14 +356,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("canvas");
   const context = canvas.getContext("2d");
 
-  canvas.width = 360;
+  canvas.width = 300;
   canvas.height = 600;
   context.scale(30, 30);
 
-  const matrix = new _piece__WEBPACK_IMPORTED_MODULE_3__["default"]().createPiece();
   const player = new _player__WEBPACK_IMPORTED_MODULE_0__["default"](
-    { x: 4, y: 0 },
-    matrix
+    { x: 3, y: 0 },
+    new _piece__WEBPACK_IMPORTED_MODULE_3__["default"]().createPiece("L")
   );
   const game = new _game__WEBPACK_IMPORTED_MODULE_1__["default"](
     player,
@@ -352,13 +376,14 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", (e) => {
     switch (e.keyCode) {
       case 32: // space to start
+        e.preventDefault();
         game.start(gameView);
         break;
       case 80:
         // p for pause
         break;
       case 77:
-        // m for mute
+        // m for mute, maybe
         break;
       default:
         break;
@@ -377,16 +402,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-const SHAPES = "IJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOT12323";
-
 class Piece {
   constructor() {
-    this.createPiece = this.createPiece.bind(this);
   }
   
-  createPiece() {
-    const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
-
+  createPiece(shape) {
     switch (shape) {
       case "T":
         return [
@@ -482,16 +502,22 @@ class Player {
   constructor(position, matrix) {
     this.position = position;
     this.matrix = matrix;
-
-    this.drawMatrix = this.drawMatrix.bind(this);
+    this.score = 0;
   }
 
-  drawMatrix(matrix, offset, context) {
+  drawMatrix(matrix, position, context) {
     matrix.forEach((row, y) => {
       row.forEach((value, x) => {
-        if (value !== 0) {
+        if (value !== 0) { // color pieces
+          context.strokeStyle = "white";
+          context.lineWidth = 0.04;
+          context.strokeRect(x + position.x, y + position.y, 1, 1);
           context.fillStyle = COLORS[value];
-          context.fillRect(x + offset.x, y + offset.y, 1, 1);
+          context.fillRect(x + position.x, y + position.y, 1, 1);
+        } else if (value === 0) { // draw board grid
+          context.strokeStyle = "white";
+          context.lineWidth = 0.04;
+          context.strokeRect(x + position.x, y + position.y, 1, 1);
         }
       });
     });

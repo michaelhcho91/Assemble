@@ -1,7 +1,7 @@
 body {
-  background-color: cornflowerblue;
-  display: flex;
-  justify-content: center;
+  background-image: url("../images/avengers-bg.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
   height: 100vh;
 }
 
@@ -11,15 +11,12 @@ body {
 }
 
 #canvas {
-  background: #000;
-  background-image: linear-gradient(white .08em, transparent .08em), 
-                    linear-gradient(90deg, white .08em, transparent .08em);
-  background-size: 1.875em 1.875em;
+  /* background: #000; */
   border: 10px solid silver;
 }
 
 .instructions-score {
-  margin-left: 100px;
+  /* margin-left: 100px; */
   width: 200px;
 }
 
@@ -32,7 +29,7 @@ body {
 } */
 
 .title {
-  margin-right: 100px;
+  /* margin-right: 100px; */
   width: 200px;
   display: flex;
   align-items: center;
