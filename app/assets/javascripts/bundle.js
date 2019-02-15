@@ -194,7 +194,6 @@ class Game {
       this.gameOver = true;
       this.isPlaying = false;
       // this.board.forEach(row => row.fill(0));
-      // render game over screen
     }
   }
   
