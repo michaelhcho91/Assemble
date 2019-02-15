@@ -157,7 +157,7 @@ class Game {
       this.player.matrix, this.player.position, ctx
     );
     
-    this.player.drawMatrix(
+    this.player.drawMatrix( // preview
       this.createBoard(12, 12), {x: 0, y: 0}, previewCtx
     );
 
@@ -278,14 +278,16 @@ class Game {
   }
 
   start(gameView) {
-    gameView.bindControls();
-
-    if (!this.gameOver) {
+    if (!this.gameOver && !this.paused) {
       this.board = this.createBoard(10, 20);
       
       this.gameOver = false;
       this.isPlaying = true;
-      
+      this.dropCounter = 0;
+
+      gameView.update();
+    } else if (this.paused) {
+      this.paused = false;
       gameView.update();
     }
 
@@ -351,52 +353,67 @@ class GameView {
   bindControls() {
     document.addEventListener("keydown", (e) => {
       switch (e.keyCode) {
+        case 13: // enter to start
+          e.preventDefault();
+          if (!this.game.isPlaying) {
+            this.game.gameOver = false;
+            this.game.start(this);
+          }
+          break;
+          
+        case 80: // p for pause
+          if (this.game.paused) {
+            this.game.start(this);
+          } else {
+            this.game.paused = true;
+          }
+          break;
+
+        case 77:
+          // m for mute, maybe
+          break;
+        
         case 37: // left
         case 65: // A
           e.preventDefault();
-
           if (!this.game.paused) {
             this.game.moveLat(-1);
           }
-
           break;
+
         case 39: // right
         case 68: // D
           e.preventDefault();
-          
           if (!this.game.paused) {
             this.game.moveLat(1);
           }
-
           break;
+
         case 40: // down
         case 83: // S
           e.preventDefault();
-
           if (!this.game.paused) {
             this.game.manualDrop();
           }
-          
           break;
+
         case 16: // SHIFT
         case 38: // up
         case 87: // W
           e.preventDefault();
-
           if (!this.game.paused) {
             this.game.playerRotate(-1);
           }
-
           break;
+
         case 32: // space
           e.preventDefault();
-
           if (!this.game.paused) {
             // this.game.hardDrop();
             // space for hard drop
           }
-
           break;
+
         default:
           break;
       }
@@ -464,32 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas
   );
 
-  document.addEventListener("keydown", (e) => {
-    switch (e.keyCode) {
-      case 13: // enter to start
-        e.preventDefault();
-
-        if (!game.isPlaying) {
-          game.gameOver = false;
-          game.start(gameView);
-        }
-        
-        break;
-      case 80: // p for pause
-        if (game.paused) {
-          game.paused = false;
-          game.start(gameView);
-        } else {
-          game.paused = true;
-        }
-        break;
-      case 77:
-        // m for mute, maybe
-        break;
-      default:
-        break;
-    }
-  });
+  gameView.bindControls();
 });
 
 /***/ }),
@@ -587,16 +579,16 @@ class Piece {
 __webpack_require__.r(__webpack_exports__);
 const COLORS = [
   null,
-  "red",
-  "green",
-  "purple",
-  "blue",
-  "yellow",
-  "orange",
-  "pink",
-  "#E5DA4D",
-  "#E3E3E3",
-  "#685326"
+  "red", // T
+  "green", // O
+  "purple", // L
+  "blue", // J
+  "yellow", // I
+  "orange", // S
+  "pink", // Z
+  "black", // 1
+  "white", // 2
+  "silver" // 3
 ];
 
 class Player {
