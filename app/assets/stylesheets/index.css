@@ -1,8 +1,18 @@
+html {
+  height: 100vh;
+  text-align: center;
+  position: relative;
+}
+
 body {
   background-image: url("../images/avengers-bg.jpg");
   background-repeat: no-repeat;
   background-size: cover;
-  height: 100vh;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-80%, -50%);
 }
 
 .game-container {
@@ -11,33 +21,45 @@ body {
 }
 
 #canvas {
-  /* background: #000; */
   border: 10px solid silver;
 }
 
+#next-piece {
+  border: 5px solid silver;
+  margin-bottom: 20px;
+}
+
 .instructions-score {
-  /* margin-left: 100px; */
   width: 200px;
+  margin-left: 50px;
+  margin-top: -200px;
+}
+
+.instructions-score h1 {
+  margin-bottom: 20px;
+  margin-left: -30px;
+  font-size: 40px;
+}
+
+.instructions-score h2 {
+  margin-top: -10px;
+  margin-bottom: -1px;
 }
 
 .arrow-controls {
   width: 200px;
 }
 
-/* #score {
-  background-color: red;
-} */
+#score {
+  font-size: 20px;
+  color: white;
+}
 
 .title {
-  /* margin-right: 100px; */
-  width: 200px;
   display: flex;
   align-items: center;
   flex-direction: column;
-}
-
-.title h1 {
-  font-size: 30px;
+  margin-right: 100px;
 }
 
 .links-list li {
@@ -48,5 +70,6 @@ body {
 
 .links-list a {
   text-decoration: none;
-  color: black;
+  color: white;
+  /* color: #DE0500; */
 }

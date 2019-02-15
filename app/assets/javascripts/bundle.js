@@ -101,19 +101,26 @@ __webpack_require__.r(__webpack_exports__);
 const SHAPES = "IJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOT123";
 
 class Game {
-  constructor(player, context) {
+  constructor(player, context, previewCtx) {
     this.player = player;
     this.context = context;
+    this.previewCtx = previewCtx;
 
     this.board = this.createBoard(10, 20);
     this.dropCounter = 0;
     this.dropInterval = 700;
     this.gameOver = false;
+    this.isPlaying = false;
     this.lastTime = 0;
+    this.nextPiece = [new _piece__WEBPACK_IMPORTED_MODULE_0__["default"]().createPiece(
+      SHAPES[Math.floor(Math.random() * SHAPES.length)]
+    )];
     this.paused = false;
   }
 
-  autoDrop(time) {
+  autoDrop(time = 0) {
+    if (this.paused) return;
+    
     const deltaTime = time - this.lastTime;
     this.lastTime = time;
     this.dropCounter += deltaTime;
@@ -137,14 +144,25 @@ class Game {
 
   draw(canvas) {
     const ctx = this.context;
+    const previewCtx = this.previewCtx;
+    const nextPiece = this.nextPiece[0];
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    previewCtx.clearRect(0, 0, 120, 120);
     
     this.player.drawMatrix( // board
       this.board, {x: 0, y: 0}, ctx
     );
     
-    this.player.drawMatrix( // player (piece)
+    this.player.drawMatrix( // current piece
       this.player.matrix, this.player.position, ctx
+    );
+    
+    this.player.drawMatrix(
+      this.createBoard(12, 12), {x: 0, y: 0}, previewCtx
+    );
+
+    this.player.drawMatrix( // next piece
+      nextPiece, {x: 0, y: 0}, previewCtx
     );
   }
 
@@ -154,13 +172,16 @@ class Game {
       Math.floor(SHAPES.length * Math.random())
     ];
 
-    this.player.matrix = piece.createPiece(shape);
+    this.nextPiece.push(piece.createPiece(shape)); // generate new nextPiece
+
+    this.player.matrix = this.nextPiece.shift(); // set currentPiece to nextPiece
     this.player.position.x = 3; // back to start position
     this.player.position.y = 0;
-
+    
     if (this.isCollided(this.board, this.player)) {
       this.gameOver = true;
-      this.board.forEach(row => row.fill(0));
+      this.isPlaying = false;
+      // this.board.forEach(row => row.fill(0));
       // render game over screen
     }
   }
@@ -189,6 +210,8 @@ class Game {
   }
 
   manualDrop() {
+    if (this.paused) return;
+    
     this.player.position.y++;
 
     if (this.isCollided(this.board, this.player)) {
@@ -255,8 +278,17 @@ class Game {
   }
 
   start(gameView) {
+    this.context.clearRect(0, 0, canvas.width, canvas.height);
+
     gameView.bindControls();
-    gameView.update();
+    debugger
+    if (!this.gameOver) {
+      debugger
+      gameView.update();
+      
+      this.gameOver = false;
+      this.isPlaying = true;
+    }
 
     // if (this.player.score >= 200) { // increase difficulty
     //   this.dropInterval -= 100;
@@ -285,9 +317,34 @@ class GameView {
     this.update = this.update.bind(this);
   }
 
-  update(time = 0) {
+  drawBoard() {
     this.game.draw(this.canvas);
-    this.game.autoDrop(time);
+  }
+
+  update(time) {
+    const g = this.game;
+
+    if (g.paused) return;
+
+    if (!g.gameOver) {
+      debugger
+      this.drawBoard();
+      g.autoDrop(time);
+    } else {
+      g.context.font = "1.5px Georgia";
+      g.context.strokeStyle = "black";
+      g.context.lineWidth = 0.2;
+      g.context.strokeText("Game Over!", 1, 6);
+      
+      g.context.font = "1.5px Georgia";
+      g.context.fillStyle = "white";
+      g.context.fillText("Game Over!", 1, 6);
+
+      g.gameOver = true;
+      g.isPlaying = false;
+      return;
+    }
+
     requestAnimationFrame(this.update);
   }
 
@@ -297,28 +354,48 @@ class GameView {
         case 37: // left
         case 65: // A
           e.preventDefault();
-          this.game.moveLat(-1);
+
+          if (!this.game.paused) {
+            this.game.moveLat(-1);
+          }
+
           break;
         case 39: // right
         case 68: // D
           e.preventDefault();
-          this.game.moveLat(1);
+          
+          if (!this.game.paused) {
+            this.game.moveLat(1);
+          }
+
           break;
         case 40: // down
         case 83: // S
           e.preventDefault();
-          this.game.manualDrop();
+
+          if (!this.game.paused) {
+            this.game.manualDrop();
+          }
+          
           break;
         case 16: // SHIFT
         case 38: // up
         case 87: // W
           e.preventDefault();
-          this.game.playerRotate(-1);
+
+          if (!this.game.paused) {
+            this.game.playerRotate(-1);
+          }
+
           break;
         case 32: // space
           e.preventDefault();
-          // this.game.hardDrop();
-          // space for hard drop
+
+          if (!this.game.paused) {
+            // this.game.hardDrop();
+            // space for hard drop
+          }
+
           break;
         default:
           break;
@@ -351,24 +428,36 @@ __webpack_require__.r(__webpack_exports__);
 
 const CANVAS_WIDTH = 300;
 const CANVAS_HEIGHT = 600;
+const PREVIEW_WIDTH = 120;
+const PREVIEW_HEIGHT = 120;
 const START_X_POS = 3;
 const START_Y_POS = 0;
+const SHAPES = "IJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOT123";
+const shape = SHAPES[
+  Math.floor(SHAPES.length * Math.random())
+];
 
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("canvas");
   const context = canvas.getContext("2d");
+  const preview = document.getElementById("next-piece");
+  const previewCtx = preview.getContext("2d");
 
   canvas.width = CANVAS_WIDTH;
   canvas.height = CANVAS_HEIGHT;
   context.scale(30, 30);
+  preview.width = PREVIEW_WIDTH;
+  preview.height = PREVIEW_HEIGHT;
+  previewCtx.scale(30, 30);
 
   const player = new _player__WEBPACK_IMPORTED_MODULE_0__["default"](
     { x: START_X_POS, y: START_Y_POS },
-    new _piece__WEBPACK_IMPORTED_MODULE_3__["default"]().createPiece("L")
+    new _piece__WEBPACK_IMPORTED_MODULE_3__["default"]().createPiece(shape)
   );
   const game = new _game__WEBPACK_IMPORTED_MODULE_1__["default"](
     player,
-    context
+    context,
+    previewCtx
   );
   const gameView = new _game_view__WEBPACK_IMPORTED_MODULE_2__["default"](
     game,
@@ -377,12 +466,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("keydown", (e) => {
     switch (e.keyCode) {
-      case 32: // space to start
+      case 13: // enter to start
         e.preventDefault();
-        game.start(gameView);
+
+        if (!game.isPlaying) {
+          game.gameOver = false;
+          game.start(gameView);
+        }
+        
         break;
-      case 80:
-        // p for pause
+      case 80: // p for pause
+        if (game.paused) {
+          game.paused = false;
+          game.start(gameView);
+        } else {
+          game.paused = true;
+        }
         break;
       case 77:
         // m for mute, maybe
@@ -488,13 +587,13 @@ class Piece {
 __webpack_require__.r(__webpack_exports__);
 const COLORS = [
   null,
-  "#5E0000",
-  "#275610",
-  "#1436BE",
-  "#E4D94C",
-  "#640063",
-  "#79191A",
-  "#5B3216",
+  "red",
+  "green",
+  "purple",
+  "blue",
+  "yellow",
+  "orange",
+  "pink",
   "#E5DA4D",
   "#E3E3E3",
   "#685326"
