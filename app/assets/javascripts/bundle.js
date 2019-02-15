@@ -98,6 +98,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _piece__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./piece */ "./lib/piece.js");
 
 
+const SHAPES = "IJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOT123";
+
 class Game {
   constructor(player, context) {
     this.player = player;
@@ -134,28 +136,27 @@ class Game {
   }
 
   draw(canvas) {
-    const c = this.context;
-    c.clearRect(0, 0, canvas.width, canvas.height);
+    const ctx = this.context;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     this.player.drawMatrix( // board
-      this.board, {x: 0, y: 0}, c
+      this.board, {x: 0, y: 0}, ctx
     );
     
     this.player.drawMatrix( // player (piece)
-      this.player.matrix, this.player.position, c
+      this.player.matrix, this.player.position, ctx
     );
   }
 
   generateNext() {
     const piece = new _piece__WEBPACK_IMPORTED_MODULE_0__["default"]();
-    const SHAPES = "IJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOT123";
     const shape = SHAPES[
       Math.floor(SHAPES.length * Math.random())
     ];
 
     this.player.matrix = piece.createPiece(shape);
+    this.player.position.x = 3; // back to start position
     this.player.position.y = 0;
-    this.player.position.x = 3;
 
     if (this.isCollided(this.board, this.player)) {
       this.gameOver = true;
@@ -284,12 +285,8 @@ class GameView {
     this.update = this.update.bind(this);
   }
 
-  drawBoard(canvas) {
-    this.game.draw(canvas);
-  }
-
   update(time = 0) {
-    this.drawBoard(this.canvas);
+    this.game.draw(this.canvas);
     this.game.autoDrop(time);
     requestAnimationFrame(this.update);
   }
@@ -352,16 +349,21 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+const CANVAS_WIDTH = 300;
+const CANVAS_HEIGHT = 600;
+const START_X_POS = 3;
+const START_Y_POS = 0;
+
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("canvas");
   const context = canvas.getContext("2d");
 
-  canvas.width = 300;
-  canvas.height = 600;
+  canvas.width = CANVAS_WIDTH;
+  canvas.height = CANVAS_HEIGHT;
   context.scale(30, 30);
 
   const player = new _player__WEBPACK_IMPORTED_MODULE_0__["default"](
-    { x: 3, y: 0 },
+    { x: START_X_POS, y: START_Y_POS },
     new _piece__WEBPACK_IMPORTED_MODULE_3__["default"]().createPiece("L")
   );
   const game = new _game__WEBPACK_IMPORTED_MODULE_1__["default"](
