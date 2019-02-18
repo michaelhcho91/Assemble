@@ -197,11 +197,14 @@ class Game {
     }
   }
   
-  // hardDrop() {
-  //   while (!this.isCollided(this.board, this.player)) {
-  //     this.manualDrop();
-  //   }
-  // }
+  hardDrop() {
+    while (!this.isCollided(this.board, this.player)) {
+      // this.manualDrop();
+      this.player.position.y++;
+    }
+    this.player.position.y--;
+    this.dropCounter = 1000;
+  }
   
   isCollided(board, player) {
     const [matrix, position] = [player.matrix, player.position];
@@ -211,7 +214,7 @@ class Game {
         const pieceEdge = matrix[y][x];
         const boardEdge = (board[y + position.y] && board[y + position.y][x + position.x]);
 
-        if (pieceEdge !== 0 && boardEdge !== 0) {
+        if (pieceEdge !== 0 && boardEdge !== 0) { // collision means non-zero on top of each other
           return true;
         }
       }
@@ -226,7 +229,7 @@ class Game {
     this.player.position.y++;
 
     if (this.isCollided(this.board, this.player)) {
-      this.player.position.y--;
+      this.player.position.y--; // move up one row to pre-collided position
       this.setPiece(this.board, this.player);
       this.generateNext();
     }
@@ -238,7 +241,7 @@ class Game {
     player.matrix.forEach((row, y) => {
       row.forEach((value, x) => {
         if (value !== 0) {
-          board[y + player.position.y][x + player.position.x] = value;
+          board[y + player.position.y][x + player.position.x] = value; // set piece value to board grid
         }
       });
     });
@@ -420,7 +423,7 @@ class GameView {
         case 32: // space
           e.preventDefault();
           if (!this.game.paused) {
-            // this.game.hardDrop();
+            this.game.hardDrop();
             // space for hard drop
           }
           break;
