@@ -122,14 +122,14 @@ class Game {
     const ctx = this.context;
 
     if (this.paused) {
-      // ctx.font = "1.5px Georgia";
-      // ctx.strokeStyle = "black";
-      // ctx.lineWidth = 0.2;
-      // ctx.strokeText("Paused", 1, 6);
+      ctx.font = "1.5px Georgia";
+      ctx.strokeStyle = "#142143";
+      ctx.lineWidth = 0.2;
+      ctx.strokeText("Paused", 2.5, 6);
 
-      // ctx.font = "1.5px Georgia";
-      // ctx.fillStyle = 0.2;
-      // ctx.fillText("Paused", 1, 6);
+      ctx.font = "1.5px Georgia";
+      // ctx.fillStyle = "white";
+      ctx.fillText("Paused", 2.5, 6);
       return;
     }
     
@@ -213,6 +213,10 @@ class Game {
       for (let x = 0; x < matrix[y].length; x++) {
         const pieceEdge = matrix[y][x];
         const boardEdge = (board[y + position.y] && board[y + position.y][x + position.x]);
+        // let boardEdge;
+        // if ((board[y + position.y] === 0) && board[y + position.y][x + position.x] === 0) {
+        //     boardEdge = 0;
+        //   } else boardEdge = 1;
 
         if (pieceEdge !== 0 && boardEdge !== 0) { // collision means non-zero on top of each other
           return true;
@@ -284,11 +288,11 @@ class Game {
       }
     }
 
-    if (direction > 0) {
-      matrix.forEach(row => row.reverse());
-    } else {
+    // if (direction > 0) { // option to rotate other direction
+      // matrix.forEach(row => row.reverse());
+    // } else {
       matrix.reverse();
-    }
+    // }
   }
 
   start(gameView) {
@@ -339,13 +343,13 @@ class GameView {
   update(time) {
     const g = this.game;
 
-    if (g.paused) return;
-
+    
     if (!g.gameOver) {
       g.context.clearRect(0, 0, canvas.width, canvas.height);
-
+      
       this.drawBoard();
       g.autoDrop(time);
+      if (g.paused) return;
     } else {
       g.context.font = "1.5px Georgia";
       g.context.strokeStyle = "#142143";
@@ -353,7 +357,7 @@ class GameView {
       g.context.strokeText("Game Over!", 1, 6);
       
       g.context.font = "1.5px Georgia";
-      g.context.fillStyle = "white";
+      // g.context.fillStyle = "white";
       g.context.fillText("Game Over!", 1, 6);
 
       g.gameOver = true;
@@ -517,9 +521,9 @@ class Piece {
     switch (shape) {
       case "T":
         return [
-          [0, 0, 0],
+          [0, 1, 0],
           [1, 1, 1],
-          [0, 1, 0]
+          [0, 0, 0]
         ];
       case "O":
         return [
@@ -540,10 +544,10 @@ class Piece {
         ];
       case "I":
         return [
-          [0, 5, 0, 0],
-          [0, 5, 0, 0],
-          [0, 5, 0, 0],
-          [0, 5, 0, 0]
+          [0, 0, 5, 0],
+          [0, 0, 5, 0],
+          [0, 0, 5, 0],
+          [0, 0, 5, 0]
         ];
       case "S":
         return [
