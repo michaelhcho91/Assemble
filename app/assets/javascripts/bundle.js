@@ -112,6 +112,7 @@ class Game {
     this.gameOver = false;
     this.isPlaying = false;
     this.lastTime = 0;
+    this.music = "paused";
     this.nextPiece = [new _piece__WEBPACK_IMPORTED_MODULE_0__["default"]().createPiece(
       SHAPES[Math.floor(Math.random() * SHAPES.length)]
     )];
@@ -122,12 +123,12 @@ class Game {
     const ctx = this.context;
 
     if (this.paused) {
-      ctx.font = "1.5px Georgia";
+      ctx.font = "1.5px Arial, Helvetica, sans-serif";
       ctx.strokeStyle = "#142143";
       ctx.lineWidth = 0.2;
       ctx.strokeText("Paused", 2.5, 6);
 
-      ctx.font = "1.5px Georgia";
+      ctx.font = "1.5px Arial, Helvetica, sans-serif";
       // ctx.fillStyle = "white";
       ctx.fillText("Paused", 2.5, 6);
       return;
@@ -193,6 +194,7 @@ class Game {
     if (this.isCollided(this.board, this.player)) {
       this.gameOver = true;
       this.isPlaying = false;
+      this.playMusic();
       // this.board.forEach(row => row.fill(0));
     }
   }
@@ -256,6 +258,18 @@ class Game {
 
     if (this.isCollided(this.board, this.player)) { // check wall collision
       this.player.position.x -= direction;
+    }
+  }
+
+  playMusic() {
+    const audio = document.getElementById("bg-music");
+
+    if (this.music === "paused") {
+      audio.play();
+      this.music = "playing";
+    } else {
+      audio.pause();
+      this.music = "paused";
     }
   }
 
@@ -351,6 +365,7 @@ class GameView {
       g.autoDrop(time);
       if (g.paused) return;
     } else {
+      this.drawBoard();
       g.context.font = "1.5px Arial, Helvetica, sans-serif";
       g.context.strokeStyle = "#142143";
       g.context.lineWidth = 0.2;
@@ -383,19 +398,22 @@ class GameView {
           if (!this.game.isPlaying || this.game.gameOver) {
             this.game.gameOver = false;
             this.game.start(this);
+            this.game.playMusic();
           }
           break;
           
         case 80: // p for pause
           if (this.game.paused) {
             this.game.start(this);
+            this.game.playMusic();
           } else {
             this.game.paused = true;
+            this.game.playMusic();
           }
           break;
 
-        case 77:
-          // m for mute, maybe
+        case 77: // m for mute
+          this.game.playMusic();
           break;
         
         case 37: // left
@@ -628,7 +646,7 @@ class Player {
       row.forEach((value, x) => {
         if (value !== 0) { // color pieces
           context.strokeStyle = "#BECEEF";
-          context.lineWidth = 0.04;
+          context.lineWidth = 0.08;
           context.strokeRect(x + position.x, y + position.y, 1, 1);
           context.fillStyle = COLORS[value];
           context.fillRect(x + position.x, y + position.y, 1, 1);
