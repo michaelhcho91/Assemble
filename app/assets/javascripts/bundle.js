@@ -351,14 +351,21 @@ class GameView {
       g.autoDrop(time);
       if (g.paused) return;
     } else {
-      g.context.font = "1.5px Georgia";
+      g.context.font = "1.5px Arial, Helvetica, sans-serif";
       g.context.strokeStyle = "#142143";
       g.context.lineWidth = 0.2;
       g.context.strokeText("Game Over!", 1, 6);
       
-      g.context.font = "1.5px Georgia";
-      // g.context.fillStyle = "white";
+      g.context.font = "1.5px Arial, Helvetica, sans-serif";
       g.context.fillText("Game Over!", 1, 6);
+
+      g.context.font = "0.8px Arial, Helvetica, sans-serif";
+      g.context.strokeStyle = "#142143";
+      g.context.lineWidth = 0.2;
+      g.context.strokeText("ENTER to play again", 1.25, 8);
+
+      g.context.font = "0.8px Arial, Helvetica, sans-serif";
+      g.context.fillText("ENTER to play again", 1.25, 8);
 
       g.gameOver = true;
       g.isPlaying = false;
@@ -373,7 +380,7 @@ class GameView {
       switch (e.keyCode) {
         case 13: // enter to start
           e.preventDefault();
-          if (!this.game.isPlaying) {
+          if (!this.game.isPlaying || this.game.gameOver) {
             this.game.gameOver = false;
             this.game.start(this);
           }
@@ -394,7 +401,7 @@ class GameView {
         case 37: // left
         case 65: // A
           e.preventDefault();
-          if (!this.game.paused) {
+          if (!this.game.paused && !this.game.gameOver) {
             this.game.moveLat(-1);
           }
           break;
@@ -402,7 +409,7 @@ class GameView {
         case 39: // right
         case 68: // D
           e.preventDefault();
-          if (!this.game.paused) {
+          if (!this.game.paused && !this.game.gameOver) {
             this.game.moveLat(1);
           }
           break;
@@ -410,7 +417,7 @@ class GameView {
         case 40: // down
         case 83: // S
           e.preventDefault();
-          if (!this.game.paused) {
+          if (!this.game.paused && !this.game.gameOver) {
             this.game.manualDrop();
           }
           break;
@@ -419,14 +426,14 @@ class GameView {
         case 38: // up
         case 87: // W
           e.preventDefault();
-          if (!this.game.paused) {
+          if (!this.game.paused && !this.game.gameOver) {
             this.game.playerRotate(-1);
           }
           break;
 
         case 32: // space
           e.preventDefault();
-          if (!this.game.paused) {
+          if (!this.game.paused && !this.game.gameOver) {
             this.game.hardDrop();
             // space for hard drop
           }
