@@ -65,6 +65,26 @@ clearRows() {
 }
 ```
 
+## Difficulty
+
+The difficulty is determined by how fast the piece falls. The rate of the fall is determined by an interval with a millisecond value, and that interval is updated based on the user's score. This is accomplished with a `switch` statement that checks the user's score.
+
+```javascript
+switch (score) {
+  case 10:
+    dropInterval = 600;
+    break;
+  case 40:
+    dropInterval = 400;
+    break;
+  case 70:
+    dropInterval = 200;
+    break;
+  default:
+    break;
+}
+```
+
 # Technologies
 
 Development technologies for `Assemble!` include HTML5 Canvas and vanilla Javascript.

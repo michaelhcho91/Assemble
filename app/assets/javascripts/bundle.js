@@ -392,10 +392,10 @@ class GameView {
           if (game.paused) {
             game.start(this);
             game.paused = false;
-            game.playMusic();
+            // game.playMusic();
           } else {
             game.paused = true;
-            game.playMusic();
+            // game.playMusic();
           }
           break;
 
@@ -458,12 +458,18 @@ class GameView {
 
       if (game.paused) return;
       
-      if (game.player.score === 10) {
-        game.dropInterval = 600;
-      } else if (game.player.score === 40) {
-        game.dropInterval = 400;
-      } else if (game.player.score === 70) {
-        game.dropInterval = 200;
+      switch (game.player.score) {
+        case 10:
+          game.dropInterval = 600;
+          break;
+        case 40:
+          game.dropInterval = 400;
+          break;
+        case 70:
+          game.dropInterval = 200;
+          break;
+        default:
+          break;
       }
     } else {
       game.draw(this.canvas);
