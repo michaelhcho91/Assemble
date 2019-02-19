@@ -193,11 +193,11 @@ class Game {
     );
 
     player.drawMatrix( // preview
-      this.createBoard(12, 12), {x: 0, y: 0}, preview
+      this.createBoard(14, 14), {x: 0, y: 0}, preview
     );
 
     player.drawMatrix( // next piece
-      nextPiece, {x: 0, y: 0}, preview
+      nextPiece, {x: 1, y: 1}, preview
     );
   }
 
@@ -267,7 +267,7 @@ class Game {
       this.setPiece(this.board, player);
       this.clearRows();
       this.generateNextPiece();
-      player.addPoints();
+      player.drawPoints();
     }
 
     this.dropCounter = 0;
@@ -383,23 +383,24 @@ class GameView {
           e.preventDefault();
           if (!game.isPlaying || game.gameOver) {
             game.gameOver = false;
+            game.isPlaying = true;
             game.start(this);
             game.playMusic();
           }
           break;
           
         case 80: // p for pause
+          e.preventDefault();
           if (game.paused) {
             game.start(this);
             game.paused = false;
-            // game.playMusic();
           } else {
             game.paused = true;
-            // game.playMusic();
           }
           break;
 
         case 77: // m for mute
+          e.preventDefault();
           game.playMusic();
           break;
         
@@ -455,9 +456,9 @@ class GameView {
     if (!game.gameOver) {
       game.draw(this.canvas);
       game.autoDrop(time);
-
-      if (game.paused) return;
       
+      if (game.paused) return;
+
       switch (game.player.score) {
         case 10:
           game.dropInterval = 600;
@@ -522,8 +523,8 @@ __webpack_require__.r(__webpack_exports__);
 
 const CANVAS_WIDTH = 300;
 const CANVAS_HEIGHT = 600;
-const PREVIEW_WIDTH = 120;
-const PREVIEW_HEIGHT = 120;
+const PREVIEW_WIDTH = 150;
+const PREVIEW_HEIGHT = 150;
 const START_X_POS = 3;
 const START_Y_POS = 0;
 const SHAPES = "IJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOT123";
@@ -603,10 +604,10 @@ class Piece {
         ];
       case "I":
         return [
-          [0, 0, 5, 0],
-          [0, 0, 5, 0],
-          [0, 0, 5, 0],
-          [0, 0, 5, 0]
+          [0, 5, 0, 0],
+          [0, 5, 0, 0],
+          [0, 5, 0, 0],
+          [0, 5, 0, 0]
         ];
       case "S":
         return [
@@ -675,7 +676,7 @@ class Player {
     this.score = 0;
   }
 
-  addPoints() {
+  drawPoints() {
     const score = document.getElementById("score");
     score.innerText = this.score;
   }
@@ -700,7 +701,7 @@ class Player {
 
   resetScore() {
     this.score = 0;
-    this.addPoints();
+    this.drawPoints();
   }
 
   transpose(matrix, direction) {
