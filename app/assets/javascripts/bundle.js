@@ -146,7 +146,7 @@ class Game {
   createBoard(width, height) {
     const board = [];
 
-    while (height--) { // while truthy, decrement
+    for (let i = 0; i < height; i++) {
       board.push(
         new Array(width).fill(0)
       );
@@ -179,6 +179,22 @@ class Game {
     );
   }
 
+  clearRows() {
+    let rowsCleared = 0;
+
+    for (let y = this.board.length - 1; y > 0; y--) {
+      for (let x = 0; x < this.board[y].length; x++) {
+        if (this.board[y].every(el => el !== 0)) {
+          this.board.splice(y, 1);
+          rowsCleared += 1;
+          this.board.unshift(new Array(10).fill(0));
+        }
+      }
+    }
+
+    this.player.score += rowsCleared;
+  }
+
   generateNext() {
     const piece = new _piece__WEBPACK_IMPORTED_MODULE_0__["default"]();
     const shape = SHAPES[
@@ -195,7 +211,8 @@ class Game {
       this.gameOver = true;
       this.isPlaying = false;
       this.playMusic();
-      // this.board.forEach(row => row.fill(0));
+      const gameover = document.getElementById("gameover");
+      gameover.play();
     }
   }
   
@@ -205,7 +222,7 @@ class Game {
       this.player.position.y++;
     }
     this.player.position.y--;
-    this.dropCounter = 1000;
+    this.dropCounter = 9999;
   }
   
   isCollided(board, player) {
@@ -237,7 +254,9 @@ class Game {
     if (this.isCollided(this.board, this.player)) {
       this.player.position.y--; // move up one row to pre-collided position
       this.setPiece(this.board, this.player);
+      this.clearRows();
       this.generateNext();
+      this.player.addPoints();
     }
 
     this.dropCounter = 0;
@@ -274,7 +293,7 @@ class Game {
   }
 
   playerRotate(direction) {
-    this.rotate(this.player.matrix, direction);
+    this.player.rotate(this.player.matrix, direction);
     const currentPosition = this.player.position.x;
     let position = 1;
 
@@ -288,27 +307,13 @@ class Game {
       }
 
       if (position > this.player.matrix[0].length) {
-        this.rotate(this.player.matrix, -direction);
+        this.player.rotate(this.player.matrix, -direction);
         this.player.position.x = currentPosition;
         return;
       }
     }
   }
   
-  rotate(matrix, direction) {
-    for(let y = 0; y < matrix.length; y++) {
-      for (let x = 0; x < y; x++) {
-        [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]]; // transpose
-      }
-    }
-
-    // if (direction > 0) { // option to rotate other direction
-      // matrix.forEach(row => row.reverse());
-    // } else {
-      matrix.reverse();
-    // }
-  }
-
   start(gameView) {
     if (!this.gameOver && !this.paused) {
       this.board = this.createBoard(10, 20);
@@ -316,6 +321,7 @@ class Game {
       this.gameOver = false;
       this.isPlaying = true;
       this.dropCounter = 0;
+      this.player.resetScore();
 
       gameView.update();
     } else if (this.paused) {
@@ -357,10 +363,7 @@ class GameView {
   update(time) {
     const g = this.game;
 
-    
     if (!g.gameOver) {
-      g.context.clearRect(0, 0, canvas.width, canvas.height);
-      
       this.drawBoard();
       g.autoDrop(time);
       if (g.paused) return;
@@ -641,6 +644,11 @@ class Player {
     this.score = 0;
   }
 
+  addPoints() {
+    const score = document.getElementById("score");
+    score.innerText = this.score;
+  }
+  
   drawMatrix(matrix, position, context) {
     matrix.forEach((row, y) => {
       row.forEach((value, x) => {
@@ -657,6 +665,25 @@ class Player {
         }
       });
     });
+  }
+
+  resetScore() {
+    this.score = 0;
+    this.addPoints();
+  }
+
+  rotate(matrix, direction) {
+    for (let y = 0; y < matrix.length; y++) {
+      for (let x = 0; x < y; x++) {
+        [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]]; // transpose
+      }
+    }
+
+    // if (direction > 0) { // option to rotate other direction
+    // matrix.forEach(row => row.reverse());
+    // } else {
+    matrix.reverse();
+    // }
   }
 }
 
