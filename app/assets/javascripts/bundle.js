@@ -152,9 +152,10 @@ class Game {
     for (let y = board.length - 1; y > 0; y--) {
       for (let x = 0; x < board[y].length; x++) {
         if (board[y].every(el => el !== 0)) {
-          board.splice(y, 1);
+          board.splice(y); // clear row
+          board.unshift(new Array(10).fill(0)); // add new empty row
+
           rowsCleared += 1;
-          board.unshift(new Array(10).fill(0));
         }
       }
     }
