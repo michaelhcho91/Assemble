@@ -454,7 +454,7 @@ class GameView {
 
         case 32: // space
           e.preventDefault();
-          if (!this.game.paused && !this.game.gameOver) {
+          if (!this.game.paused && this.game.isPlaying) {
             this.game.hardDrop();
             // space for hard drop
           }
