@@ -368,6 +368,7 @@ class GameView {
         case 80: // p for pause
           if (this.game.paused) {
             this.game.start(this);
+            this.game.paused = false;
             this.game.playMusic();
           } else {
             this.game.paused = true;
@@ -412,11 +413,10 @@ class GameView {
           }
           break;
 
-        case 32: // space
+        case 32: // space for hard drop
           e.preventDefault();
           if (!this.game.paused && this.game.isPlaying) {
             this.game.hardDrop();
-            // space for hard drop
           }
           break;
 
@@ -432,12 +432,14 @@ class GameView {
     if (!g.gameOver) {
       g.draw(this.canvas);
       g.autoDrop(time);
+
       if (g.paused) return;
-      if (g.player.score === 15) {
+      
+      if (g.player.score === 10) {
         g.dropInterval = 600;
-      } else if (g.player.score === 45) {
+      } else if (g.player.score === 40) {
         g.dropInterval = 400;
-      } else if (g.player.score === 90) {
+      } else if (g.player.score === 70) {
         g.dropInterval = 200;
       }
     } else {
