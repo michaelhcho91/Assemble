@@ -53,7 +53,7 @@ clearRows() {
   for (let y = board.length - 1; y > 0; y--) {
     for (let x = 0; x < board[y].length; x++) {
       if (board[y].every(el => el !== 0)) {
-        board.splice(y);
+        board.splice(y, 1);
         board.unshift(new Array(10).fill(0));
 
         rowsCleared += 1;

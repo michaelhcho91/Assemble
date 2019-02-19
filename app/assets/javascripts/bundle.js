@@ -152,7 +152,7 @@ class Game {
     for (let y = board.length - 1; y > 0; y--) {
       for (let x = 0; x < board[y].length; x++) {
         if (board[y].every(el => el !== 0)) {
-          board.splice(y); // clear row
+          board.splice(y, 1); // clear row
           board.unshift(new Array(10).fill(0)); // add new empty row
 
           rowsCleared += 1;
@@ -264,6 +264,7 @@ class Game {
 
     if (this.isCollided(this.board, player)) {
       player.position.y--; // move up one row to pre-collided position
+
       this.setPiece(this.board, player);
       this.clearRows();
       this.generateNextPiece();
@@ -301,7 +302,6 @@ class Game {
     const position = this.player.position;
 
     player.transpose(matrix, direction);
-    const currentPosition = position.x;
     let offset = 1;
 
     while (this.isCollided(this.board, player)) {
@@ -312,21 +312,14 @@ class Game {
       } else {
         offset = -offset + -1;
       }
-
-      if (offset > matrix[0].length) {
-        player.transpose(matrix, -direction);
-        position.x = currentPosition;
-
-        return;
-      }
     }
   }
 
   setPiece(board, player) {
     const position = player.position;
-    const matrix = player.matrix;
+    const piece = player.matrix;
     
-    matrix.forEach((row, y) => {
+    piece.forEach((row, y) => {
       row.forEach((value, x) => {
         if (value !== 0) {
           board[y + position.y][x + position.x] = value; // set piece value to board grid
