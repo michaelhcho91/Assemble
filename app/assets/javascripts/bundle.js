@@ -98,13 +98,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _piece__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./piece */ "./lib/piece.js");
 
 
-const SHAPES = "IJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOT123";
+const SHAPES = "IJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOT123"; // lower chance for 123
 
 class Game {
   constructor(player, context, previewCtx) {
     this.player = player;
     this.context = context;
-    this.previewCtx = previewCtx;
+    this.preview = previewCtx;
 
     this.board = this.createBoard(10, 20);
     this.dropCounter = 0;
@@ -113,9 +113,11 @@ class Game {
     this.isPlaying = false;
     this.lastTime = 0;
     this.music = "paused";
-    this.nextPiece = [new _piece__WEBPACK_IMPORTED_MODULE_0__["default"]().createPiece(
-      SHAPES[Math.floor(Math.random() * SHAPES.length)]
-    )];
+    this.nextPiece = [
+      new _piece__WEBPACK_IMPORTED_MODULE_0__["default"]().createPiece(
+        SHAPES[Math.floor(Math.random() * SHAPES.length)]
+      )
+    ];
     this.paused = false;
   }
 
@@ -145,13 +147,14 @@ class Game {
 
   clearRows() {
     let rowsCleared = 0;
+    const board = this.board;
 
-    for (let y = this.board.length - 1; y > 0; y--) {
-      for (let x = 0; x < this.board[y].length; x++) {
-        if (this.board[y].every(el => el !== 0)) {
-          this.board.splice(y, 1);
+    for (let y = board.length - 1; y > 0; y--) {
+      for (let x = 0; x < board[y].length; x++) {
+        if (board[y].every(el => el !== 0)) {
+          board.splice(y, 1);
           rowsCleared += 1;
-          this.board.unshift(new Array(10).fill(0));
+          board.unshift(new Array(10).fill(0));
         }
       }
     }
@@ -173,56 +176,32 @@ class Game {
 
   draw(canvas) {
     const ctx = this.context;
-    const previewCtx = this.previewCtx;
+    const preview = this.preview;
     const nextPiece = this.nextPiece[0];
+    const player = this.player;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    previewCtx.clearRect(0, 0, 120, 120);
+    preview.clearRect(0, 0, 120, 120);
     
-    this.player.drawMatrix( // board
+    player.drawMatrix( // board
       this.board, {x: 0, y: 0}, ctx
     );
     
-    this.player.drawMatrix( // current piece
-      this.player.matrix, this.player.position, ctx
+    player.drawMatrix( // current piece
+      player.matrix, player.position, ctx
     );
 
-    this.player.drawMatrix( // preview
-      this.createBoard(12, 12), {x: 0, y: 0}, previewCtx
+    player.drawMatrix( // preview
+      this.createBoard(12, 12), {x: 0, y: 0}, preview
     );
 
-    this.player.drawMatrix( // next piece
-      nextPiece, {x: 0, y: 0}, previewCtx
+    player.drawMatrix( // next piece
+      nextPiece, {x: 0, y: 0}, preview
     );
-
-    this.drawGhostPiece();
   }
 
-  drawGhostPiece() {
-    const matrix = this.player.matrix;
-    const position = this.player.position;
-
-    for (let ghostRow = 0; ghostRow < 20; ghostRow++) {
-      if (ghostRow > position[0] &&
-        this.isCollided(matrix, [ghostRow, position[1]])) {
-        matrix.forEach((row, y) => {
-          row.forEach((value, x) => {
-            if (value !== 0) {
-              this.context.fillStyle = "rgba(255,255,255,0.15)";
-              this.context.fillRect(
-                x + position[1] + 0.05,
-                y - 1 + ghostRow + 0.05,
-                0.9,
-                0.9
-              );
-            }
-          });
-        });
-        return false;
-      }
-    }
-  }
-
-  generateNext() {
+  generateNextPiece() {
+    const player = this.player;
     const piece = new _piece__WEBPACK_IMPORTED_MODULE_0__["default"]();
     const shape = SHAPES[
       Math.floor(SHAPES.length * Math.random())
@@ -230,11 +209,11 @@ class Game {
 
     this.nextPiece.push(piece.createPiece(shape)); // generate new nextPiece
 
-    this.player.matrix = this.nextPiece.shift(); // set currentPiece to nextPiece
-    this.player.position.x = 3; // back to start position
-    this.player.position.y = 0;
+    player.matrix = this.nextPiece.shift(); // set currentPiece to nextPiece
+    player.position.x = 3; // back to start position
+    player.position.y = 0;
     
-    if (this.isCollided(this.board, this.player)) {
+    if (this.isCollided(this.board, player)) {
       this.gameOver = true;
       this.isPlaying = false;
       this.playMusic();
@@ -244,16 +223,19 @@ class Game {
   }
   
   hardDrop() {
-    while (!this.isCollided(this.board, this.player)) {
-      // this.manualDrop();
-      this.player.position.y++;
+    const player = this.player;
+    
+    while (!this.isCollided(this.board, player)) {
+      player.position.y++;
     }
-    this.player.position.y--;
+
+    player.position.y--;
     this.dropCounter = 9999;
   }
   
   isCollided(board, player) {
-    const [matrix, position] = [player.matrix, player.position];
+    const matrix = player.matrix;
+    const position = player.position;
 
     for (let y = 0; y < matrix.length; y++) {
       for (let x = 0; x < matrix[y].length; x++) {
@@ -274,26 +256,29 @@ class Game {
   }
 
   manualDrop() {
+    const player = this.player;
     if (this.paused) return;
     
-    this.player.position.y++;
+    player.position.y++;
 
-    if (this.isCollided(this.board, this.player)) {
-      this.player.position.y--; // move up one row to pre-collided position
-      this.setPiece(this.board, this.player);
+    if (this.isCollided(this.board, player)) {
+      player.position.y--; // move up one row to pre-collided position
+      this.setPiece(this.board, player);
       this.clearRows();
-      this.generateNext();
-      this.player.addPoints();
+      this.generateNextPiece();
+      player.addPoints();
     }
 
     this.dropCounter = 0;
   }
 
   moveLat(direction) {
-    this.player.position.x += direction;
+    const player = this.player;
+    
+    player.position.x += direction;
 
-    if (this.isCollided(this.board, this.player)) { // check wall collision
-      this.player.position.x -= direction;
+    if (this.isCollided(this.board, player)) { // check wall collision
+      player.position.x -= direction;
     }
   }
 
@@ -309,33 +294,41 @@ class Game {
     }
   }
 
-  playerRotate(direction) {
-    this.player.rotate(this.player.matrix, direction);
-    const currentPosition = this.player.position.x;
-    let position = 1;
+  rotate(direction) {
+    const player = this.player;
+    const matrix = this.player.matrix;
+    const position = this.player.position;
 
-    while (this.isCollided(this.board, this.player)) {
-      this.player.position.x += position;
+    player.transpose(matrix, direction);
+    const currentPosition = position.x;
+    let offset = 1;
 
-      if (position > 0) {
-        position = -position + 1;
+    while (this.isCollided(this.board, player)) {
+      position.x += offset;
+
+      if (offset > 0) {
+        offset = -offset + 1;
       } else {
-        position = -position + -1;
+        offset = -offset + -1;
       }
 
-      if (position > this.player.matrix[0].length) {
-        this.player.rotate(this.player.matrix, -direction);
-        this.player.position.x = currentPosition;
+      if (offset > matrix[0].length) {
+        player.transpose(matrix, -direction);
+        position.x = currentPosition;
+
         return;
       }
     }
   }
 
   setPiece(board, player) {
-    player.matrix.forEach((row, y) => {
+    const position = player.position;
+    const matrix = player.matrix;
+    
+    matrix.forEach((row, y) => {
       row.forEach((value, x) => {
         if (value !== 0) {
-          board[y + player.position.y][x + player.position.x] = value; // set piece value to board grid
+          board[y + position.y][x + position.x] = value; // set piece value to board grid
         }
       });
     });
@@ -381,53 +374,55 @@ class GameView {
   }
 
   bindControls() {
+    const game = this.game;
+    
     document.addEventListener("keydown", (e) => {
       switch (e.keyCode) {
         case 13: // enter to start
           e.preventDefault();
-          if (!this.game.isPlaying || this.game.gameOver) {
-            this.game.gameOver = false;
-            this.game.start(this);
-            this.game.playMusic();
+          if (!game.isPlaying || game.gameOver) {
+            game.gameOver = false;
+            game.start(this);
+            game.playMusic();
           }
           break;
           
         case 80: // p for pause
-          if (this.game.paused) {
-            this.game.start(this);
-            this.game.paused = false;
-            this.game.playMusic();
+          if (game.paused) {
+            game.start(this);
+            game.paused = false;
+            game.playMusic();
           } else {
-            this.game.paused = true;
-            this.game.playMusic();
+            game.paused = true;
+            game.playMusic();
           }
           break;
 
         case 77: // m for mute
-          this.game.playMusic();
+          game.playMusic();
           break;
         
         case 37: // left
         case 65: // A
           e.preventDefault();
-          if (!this.game.paused && !this.game.gameOver) {
-            this.game.moveLat(-1);
+          if (!game.paused && !game.gameOver) {
+            game.moveLat(-1);
           }
           break;
 
         case 39: // right
         case 68: // D
           e.preventDefault();
-          if (!this.game.paused && !this.game.gameOver) {
-            this.game.moveLat(1);
+          if (!game.paused && !game.gameOver) {
+            game.moveLat(1);
           }
           break;
 
         case 40: // down
         case 83: // S
           e.preventDefault();
-          if (!this.game.paused && !this.game.gameOver) {
-            this.game.manualDrop();
+          if (!game.paused && !game.gameOver) {
+            game.manualDrop();
           }
           break;
 
@@ -435,15 +430,15 @@ class GameView {
         case 38: // up
         case 87: // W
           e.preventDefault();
-          if (!this.game.paused && !this.game.gameOver) {
-            this.game.playerRotate(-1);
+          if (!game.paused && !game.gameOver) {
+            game.rotate(-1);
           }
           break;
 
         case 32: // space for hard drop
           e.preventDefault();
-          if (!this.game.paused && this.game.isPlaying) {
-            this.game.hardDrop();
+          if (!game.paused && game.isPlaying) {
+            game.hardDrop();
           }
           break;
 
@@ -454,41 +449,41 @@ class GameView {
   }
 
   update(time) {
-    const g = this.game;
+    const game = this.game;
 
-    if (!g.gameOver) {
-      g.draw(this.canvas);
-      g.autoDrop(time);
+    if (!game.gameOver) {
+      game.draw(this.canvas);
+      game.autoDrop(time);
 
-      if (g.paused) return;
+      if (game.paused) return;
       
-      if (g.player.score === 10) {
-        g.dropInterval = 600;
-      } else if (g.player.score === 40) {
-        g.dropInterval = 400;
-      } else if (g.player.score === 70) {
-        g.dropInterval = 200;
+      if (game.player.score === 10) {
+        game.dropInterval = 600;
+      } else if (game.player.score === 40) {
+        game.dropInterval = 400;
+      } else if (game.player.score === 70) {
+        game.dropInterval = 200;
       }
     } else {
-      g.draw(this.canvas);
-      g.context.font = "1.5px Arial, Helvetica, sans-serif";
-      g.context.strokeStyle = "#142143";
-      g.context.lineWidth = 0.2;
-      g.context.strokeText("Game Over!", 1, 6);
+      game.draw(this.canvas);
+      game.context.font = "1.5px Arial, Helvetica, sans-serif";
+      game.context.strokeStyle = "#142143";
+      game.context.lineWidth = 0.2;
+      game.context.strokeText("Game Over!", 1, 6);
 
-      g.context.font = "1.5px Arial, Helvetica, sans-serif";
-      g.context.fillText("Game Over!", 1, 6);
+      game.context.font = "1.5px Arial, Helvetica, sans-serif";
+      game.context.fillText("Game Over!", 1, 6);
 
-      g.context.font = "0.8px Arial, Helvetica, sans-serif";
-      g.context.strokeStyle = "#142143";
-      g.context.lineWidth = 0.2;
-      g.context.strokeText("ENTER to play again", 1.25, 8);
+      game.context.font = "0.8px Arial, Helvetica, sans-serif";
+      game.context.strokeStyle = "#142143";
+      game.context.lineWidth = 0.2;
+      game.context.strokeText("ENTER to play again", 1.25, 8);
 
-      g.context.font = "0.8px Arial, Helvetica, sans-serif";
-      g.context.fillText("ENTER to play again", 1.25, 8);
+      game.context.font = "0.8px Arial, Helvetica, sans-serif";
+      game.context.fillText("ENTER to play again", 1.25, 8);
 
-      g.gameOver = true;
-      g.isPlaying = false;
+      game.gameOver = true;
+      game.isPlaying = false;
       return;
     }
 
@@ -701,7 +696,7 @@ class Player {
     this.addPoints();
   }
 
-  rotate(matrix, direction) {
+  transpose(matrix, direction) {
     for (let y = 0; y < matrix.length; y++) {
       for (let x = 0; x < y; x++) {
         [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]]; // transpose
