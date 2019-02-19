@@ -430,6 +430,13 @@ class GameView {
           }
           break;
 
+        case 90: // Z for rotate other direction
+          e.preventDefault();
+          if (!game.paused && !game.gameOver) {
+            game.rotate(1);
+          }
+          break;
+
         case 32: // space for hard drop
           e.preventDefault();
           if (!game.paused && game.isPlaying) {
@@ -704,11 +711,11 @@ class Player {
       }
     }
 
-    // if (direction > 0) { // option to rotate other direction
-    // matrix.forEach(row => row.reverse());
-    // } else {
+    if (direction > 0) { // rotate other direction
+    matrix.forEach(row => row.reverse());
+    } else {
     matrix.reverse();
-    // }
+    }
   }
 }
 
