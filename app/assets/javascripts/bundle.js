@@ -108,7 +108,7 @@ class Game {
 
     this.board = this.createBoard(10, 20);
     this.dropCounter = 0;
-    this.dropInterval = 700;
+    this.dropInterval = 800;
     this.gameOver = false;
     this.isPlaying = false;
     this.lastTime = 0;
@@ -321,6 +321,7 @@ class Game {
       this.gameOver = false;
       this.isPlaying = true;
       this.dropCounter = 0;
+      this.dropInterval = 800;
       this.player.resetScore();
 
       gameView.update();
@@ -328,10 +329,6 @@ class Game {
       this.paused = false;
       gameView.update();
     }
-
-    // if (this.player.score >= 200) { // increase difficulty
-    //   this.dropInterval -= 100;
-    // }
   }
 }
 
@@ -354,43 +351,6 @@ class GameView {
     this.canvas = canvas;
 
     this.update = this.update.bind(this);
-  }
-
-  drawBoard() {
-    this.game.draw(this.canvas);
-  }
-
-  update(time) {
-    const g = this.game;
-
-    if (!g.gameOver) {
-      this.drawBoard();
-      g.autoDrop(time);
-      if (g.paused) return;
-    } else {
-      this.drawBoard();
-      g.context.font = "1.5px Arial, Helvetica, sans-serif";
-      g.context.strokeStyle = "#142143";
-      g.context.lineWidth = 0.2;
-      g.context.strokeText("Game Over!", 1, 6);
-      
-      g.context.font = "1.5px Arial, Helvetica, sans-serif";
-      g.context.fillText("Game Over!", 1, 6);
-
-      g.context.font = "0.8px Arial, Helvetica, sans-serif";
-      g.context.strokeStyle = "#142143";
-      g.context.lineWidth = 0.2;
-      g.context.strokeText("ENTER to play again", 1.25, 8);
-
-      g.context.font = "0.8px Arial, Helvetica, sans-serif";
-      g.context.fillText("ENTER to play again", 1.25, 8);
-
-      g.gameOver = true;
-      g.isPlaying = false;
-      return;
-    }
-
-    requestAnimationFrame(this.update);
   }
 
   bindControls() {
@@ -464,6 +424,46 @@ class GameView {
           break;
       }
     });
+  }
+
+  update(time) {
+    const g = this.game;
+
+    if (!g.gameOver) {
+      g.draw(this.canvas);
+      g.autoDrop(time);
+      if (g.paused) return;
+      if (g.player.score === 15) {
+        g.dropInterval = 600;
+      } else if (g.player.score === 45) {
+        g.dropInterval = 400;
+      } else if (g.player.score === 90) {
+        g.dropInterval = 200;
+      }
+    } else {
+      g.draw(this.canvas);
+      g.context.font = "1.5px Arial, Helvetica, sans-serif";
+      g.context.strokeStyle = "#142143";
+      g.context.lineWidth = 0.2;
+      g.context.strokeText("Game Over!", 1, 6);
+
+      g.context.font = "1.5px Arial, Helvetica, sans-serif";
+      g.context.fillText("Game Over!", 1, 6);
+
+      g.context.font = "0.8px Arial, Helvetica, sans-serif";
+      g.context.strokeStyle = "#142143";
+      g.context.lineWidth = 0.2;
+      g.context.strokeText("ENTER to play again", 1.25, 8);
+
+      g.context.font = "0.8px Arial, Helvetica, sans-serif";
+      g.context.fillText("ENTER to play again", 1.25, 8);
+
+      g.gameOver = true;
+      g.isPlaying = false;
+      return;
+    }
+
+    requestAnimationFrame(this.update);
   }
 }
 
