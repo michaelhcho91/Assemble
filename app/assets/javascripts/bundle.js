@@ -113,7 +113,7 @@ class Game {
     this.isPlaying = false;
     this.lastTime = 0;
     this.music = "paused";
-    this.nextPiece = [
+    this.nextPieceArray = [
       new _piece__WEBPACK_IMPORTED_MODULE_0__["default"]().createPiece(
         SHAPES[Math.floor(Math.random() * SHAPES.length)]
       )
@@ -178,7 +178,7 @@ class Game {
   draw(canvas) {
     const ctx = this.context;
     const preview = this.preview;
-    const nextPiece = this.nextPiece[0];
+    const nextPiece = this.nextPieceArray[0];
     const player = this.player;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -187,7 +187,7 @@ class Game {
     player.drawMatrix( // board
       this.board, {x: 0, y: 0}, ctx
     );
-    
+
     player.drawMatrix( // current piece
       player.matrix, player.position, ctx
     );
@@ -199,6 +199,23 @@ class Game {
     player.drawMatrix( // next piece
       nextPiece, {x: 1, y: 1}, preview
     );
+
+    // this.drawShadow();
+  }
+
+  drawShadow() {
+    const matrix = this.player.matrix;
+    const position = this.player.position;
+
+    // const shadowPlayer = Object.assign({}, this.player);
+    const shadowPlayer = JSON.parse(JSON.stringify(this.player));
+
+    // return shadowPlayer;
+    // while (!this.isCollided(this.board, shadowPlayer.position)) {
+    //   shadowPlayer.position.y++;
+    // }
+
+    // shadowPlayer.position.y--;
   }
 
   generateNextPiece() {
@@ -208,13 +225,23 @@ class Game {
       Math.floor(SHAPES.length * Math.random())
     ];
 
-    this.nextPiece.push(piece.createPiece(shape)); // generate new nextPiece
+    // this.nextPieceArray.push(piece.createPiece(shape)); // generate new nextPiece
 
-    player.matrix = this.nextPiece.shift(); // set currentPiece to nextPiece
+    let ready = false;
+    while (!ready) {
+      const newPiece = piece.createPiece(shape);
+
+      if (!this.nextPieceArray.includes(newPiece)) {
+        this.nextPieceArray.push(newPiece);
+        ready = true;
+      }
+    }
+    
+    player.matrix = this.nextPieceArray.shift(); // set currentPiece to nextPiece
     player.position.x = 3; // back to start position
     player.position.y = 0;
     
-    if (this.isCollided(this.board, player)) {
+    if (this.isCollided(player.matrix, player.position)) {
       this.gameOver = true;
       this.isPlaying = false;
       this.playMusic();
@@ -227,7 +254,7 @@ class Game {
   hardDrop() {
     const player = this.player;
     
-    while (!this.isCollided(this.board, player)) {
+    while (!this.isCollided(player.matrix, player.position)) {
       player.position.y++;
     }
 
@@ -235,21 +262,19 @@ class Game {
     this.dropCounter = 9999;
   }
   
-  isCollided(board, player) {
-    const matrix = player.matrix;
-    const position = player.position;
+  isCollided(piece, position) {
+    // const piece = this.player.matrix;
+    // const position = player.position;
 
-    for (let y = 0; y < matrix.length; y++) {
-      for (let x = 0; x < matrix[y].length; x++) {
-        const pieceEdge = matrix[y][x];
-        const boardEdge = (board[y + position.y] && board[y + position.y][x + position.x]);
-        // let boardEdge;
-        // if ((board[y + position.y] === 0) && board[y + position.y][x + position.x] === 0) {
-        //     boardEdge = 0;
-        //   } else boardEdge = 1;
+    for (let y = 0; y < piece.length; y++) {
+      for (let x = 0; x < piece[0].length; x++) {
+        if (piece[y][x] !== 0) {
+          const xOffset = x + position.x;
+          const yOffset = y + position.y;
 
-        if (pieceEdge !== 0 && boardEdge !== 0) { // collision means non-zero on top of each other
-          return true;
+          if (this.isOutOfBounds(xOffset, yOffset) || this.board[yOffset][xOffset] !== 0) {
+            return true;
+          }
         }
       }
     }
@@ -263,8 +288,8 @@ class Game {
     
     player.position.y++;
 
-    if (this.isCollided(this.board, player)) {
-      player.position.y--; // move up one row to pre-collided position
+    if (this.isCollided(player.matrix, player.position)) {
+      player.position.y--;
 
       this.setPiece(this.board, player);
       this.clearRows();
@@ -280,11 +305,19 @@ class Game {
     
     player.position.x += direction;
 
-    if (this.isCollided(this.board, player)) { // check wall collision
+    if (this.isCollided(player.matrix, player.position)) {
       player.position.x -= direction;
     }
   }
 
+  isOutOfBounds(x, y) {
+    if (x < 0 || x > 9 || y < 0 || y > 19) {
+      return true;
+    }
+
+    return false;
+  }
+  
   playMusic() {
     const audio = document.getElementById("bg-music");
 
@@ -313,7 +346,7 @@ class Game {
     player.transpose(matrix, direction);
     
     let offset = 1;
-    while (this.isCollided(this.board, player)) {
+    while (this.isCollided(player.matrix, player.position)) {
       position.x += offset;
 
       if (offset > 0) {
@@ -342,6 +375,7 @@ class Game {
       this.board = this.createBoard(10, 20);
       this.reset();
       this.isPlaying = true;
+      this.playMusic();
       gameView.update();
     } else if (this.paused) {
       this.paused = false;
@@ -381,9 +415,7 @@ class GameView {
 
           if (!game.isPlaying || game.gameOver) {
             game.gameOver = false;
-            game.isPlaying = true;
             game.start(this);
-            game.playMusic();
           }
           break;
           
@@ -484,7 +516,7 @@ class GameView {
         case 70:
           game.dropInterval = 200;
           break;
-          
+
         default:
           break;
       }
@@ -542,7 +574,7 @@ const CANVAS_HEIGHT = 600;
 const PREVIEW_WIDTH = 150;
 const PREVIEW_HEIGHT = 150;
 const START_X_POS = 3;
-const START_Y_POS = 0;
+const START_Y_POS = -1;
 const SHAPES = "IJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOT123";
 const shape = SHAPES[
   Math.floor(SHAPES.length * Math.random())
@@ -574,6 +606,15 @@ document.addEventListener("DOMContentLoaded", () => {
     game,
     canvas
   );
+
+  context.font = "1px Arial, Helvetica, sans-serif";
+  context.strokeStyle = "#142143";
+  context.lineWidth = 0.2;
+  context.strokeText("ENTER to play!", 1.6, 6);
+
+  context.font = "1px Arial, Helvetica, sans-serif";
+  context.fillStyle = "#BECEEF";
+  context.fillText("ENTER to play!", 1.6, 6);
 
   gameView.bindControls();
 });
