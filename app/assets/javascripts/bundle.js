@@ -259,7 +259,9 @@ class Game {
     if (this.isCollided(player.matrix, player.position)) {
       this.gameOver = true;
       this.isPlaying = false;
-      this.playMusic();
+      if (this.musicPlaying) {
+        this.playMusic();
+      }
       const gameover = document.getElementById("gameover");
       gameover.volume = 0.1;
       gameover.play();
@@ -275,6 +277,22 @@ class Game {
 
     player.position.y--;
     this.startTime = 9999;
+  }
+
+  increaseDifficulty() {
+    const player = this.player;
+
+    if (player.score > 500000 && player.score < 1000000) {
+      this.dropInterval = 700;
+    } else if (player.score > 2000000 && player.score < 4000000) {
+      this.dropInterval = 500;
+    } else if (player.score > 5000000 && player.score < 7000000) {
+      this.dropInterval = 300;
+    } else if (player.score > 8000000 && player.score < 10000000) {
+      this.dropInterval = 150;
+    } else if (player.score > 10000000) {
+      this.dropInterval = 50;
+    }
   }
   
   isCollided(piece, position) {
@@ -544,24 +562,13 @@ class GameView {
       
       if (game.paused) return;
 
-      if (game.player.score > 500000 && game.player.score < 1000000) {
-        game.dropInterval = 700;
-      } else if (game.player.score > 2000000 && game.player.score < 4000000) {
-        game.dropInterval = 500;
-      } else if (game.player.score > 5000000 && game.player.score < 7000000) {
-        game.dropInterval = 300;
-      } else if (game.player.score > 8000000 && game.player.score < 10000000) {
-        game.dropInterval = 150;
-      } else if (game.player.score > 10000000) {
-        game.dropInterval = 50;
-      }
+      game.increaseDifficulty();
     } else {
       game.draw(this.canvas);
       game.context.font = "1.5px Arial, Helvetica, sans-serif";
       game.context.strokeStyle = "#142143";
       game.context.lineWidth = 0.2;
       game.context.strokeText("Game Over!", 1, 6);
-
       game.context.font = "1.5px Arial, Helvetica, sans-serif";
       game.context.fillText("Game Over!", 1, 6);
 
@@ -569,13 +576,11 @@ class GameView {
       game.context.strokeStyle = "#142143";
       game.context.lineWidth = 0.2;
       game.context.strokeText("ENTER to play again", 1.25, 8);
-
       game.context.font = "0.8px Arial, Helvetica, sans-serif";
       game.context.fillText("ENTER to play again", 1.25, 8);
 
       game.gameOver = true;
       game.isPlaying = false;
-      return;
     }
 
     requestAnimationFrame(this.update);
