@@ -107,18 +107,19 @@ class Game {
     this.preview = previewCtx;
 
     this.board = this.createBoard(10, 20);
-    this.dropCounter = 0;
-    this.dropInterval = 800;
+    this.startTime = 0;
+    this.dropInterval = 700;
     this.gameOver = false;
     this.isPlaying = false;
     this.lastTime = 0;
-    this.music = "paused";
+    this.musicPlaying = false;
     this.nextPieceArray = [
       new _piece__WEBPACK_IMPORTED_MODULE_0__["default"]().createPiece(
         SHAPES[Math.floor(Math.random() * SHAPES.length)]
       )
     ];
     this.paused = false;
+    this.wantShadow = false;
   }
 
   autoDrop(time = 0) {
@@ -129,18 +130,15 @@ class Game {
       ctx.strokeStyle = "#142143";
       ctx.lineWidth = 0.2;
       ctx.strokeText("Paused", 2.5, 6);
-
       ctx.font = "1.5px Arial, Helvetica, sans-serif";
-      // ctx.fillStyle = "white";
       ctx.fillText("Paused", 2.5, 6);
-      return;
     }
     
     const deltaTime = time - this.lastTime;
     this.lastTime = time;
-    this.dropCounter += deltaTime;
+    this.startTime += deltaTime;
 
-    if (this.dropCounter > this.dropInterval) {
+    if (this.startTime > this.dropInterval) {
       this.manualDrop();
     }
   }
@@ -188,39 +186,50 @@ class Game {
       this.board, {x: 0, y: 0}, ctx
     );
 
+    this.drawShadow(); // shadow
+    
     player.drawMatrix( // current piece
       player.matrix, player.position, ctx
-    );
-
-    player.drawMatrix( // preview
-      this.createBoard(14, 14), {x: 0, y: 0}, preview
     );
 
     player.drawMatrix( // next piece
       nextPiece, {x: 1, y: 1}, preview
     );
-
-    // this.drawShadow();
+    
+    player.drawMatrix( // preview
+      this.createBoard(14, 14), {x: 0, y: 0}, preview
+    );
   }
 
   drawShadow() {
-    const matrix = this.player.matrix;
+    if (!this.wantShadow) return;
+    
+    const shadow = this.player.matrix;
     const position = this.player.position;
+    const ctx = this.context;
 
-    // const shadowPlayer = Object.assign({}, this.player);
-    const shadowPlayer = JSON.parse(JSON.stringify(this.player));
-
-    // return shadowPlayer;
-    let set = false;
-    while (!set) {
-      shadowPlayer.position = position;
-      shadowPlayer.position.y++;
-      if (this.isCollided(matrix, position)) {
-        set = true;
+    let i = 0;
+    while (i < this.board.length) {
+      const shadowPosition = {
+        x: position.x,
+        y: i
+      };
+      
+      if (i > position.y && this.isCollided(shadow, shadowPosition)) {
+        
+        for (let y = 0; y < shadow.length; y++) {
+          for (let x = 0; x < shadow[0].length; x++) {
+            if (shadow[y][x] !== 0) {
+              ctx.fillStyle = "#BECEEF";
+              ctx.fillRect(x + position.x + 0.2, y + i - 0.8, 0.6, 0.6);
+            }
+          }
+        }
+        
+        break;
       }
+      i++;
     }
-
-    shadowPlayer.position.y--;
   }
 
   generateNextPiece() {
@@ -264,7 +273,7 @@ class Game {
     }
 
     player.position.y--;
-    this.dropCounter = 9999;
+    this.startTime = 9999;
   }
   
   isCollided(piece, position) {
@@ -287,6 +296,14 @@ class Game {
     return false;
   }
 
+  isOutOfBounds(x, y) {
+    if (x < 0 || x > 9 || y < 0 || y > 19) {
+      return true;
+    }
+
+    return false;
+  }
+
   manualDrop() {
     const player = this.player;
     if (this.paused) return;
@@ -302,7 +319,7 @@ class Game {
       player.drawPoints();
     }
 
-    this.dropCounter = 0;
+    this.startTime = 0;
   }
 
   moveLat(direction) {
@@ -315,31 +332,23 @@ class Game {
     }
   }
 
-  isOutOfBounds(x, y) {
-    if (x < 0 || x > 9 || y < 0 || y > 19) {
-      return true;
-    }
-
-    return false;
-  }
-  
   playMusic() {
     const audio = document.getElementById("bg-music");
 
-    if (this.music === "paused") {
+    if (this.musicPlaying) {
+      audio.pause();
+      this.musicPlaying = false;
+    } else {
       audio.volume = 0.3;
       audio.play();
-      this.music = "playing";
-    } else {
-      audio.pause();
-      this.music = "paused";
+      this.musicPlaying = true;
     }
   }
 
   reset() {
     this.gameOver = false;
-    this.dropCounter = 0;
-    this.dropInterval = 800;
+    this.startTime = 0;
+    this.dropInterval = 700;
     this.player.resetScore();
   }
   
@@ -494,6 +503,16 @@ class GameView {
           }
           break;
 
+        case 9: // tab for shadow
+          e.preventDefault();
+
+          if (game.wantShadow && game.isPlaying) {
+            game.wantShadow = false;
+          } else {
+            game.wantShadow = true;
+          }
+          break;
+
         default:
           break;
       }
@@ -510,16 +529,16 @@ class GameView {
       if (game.paused) return;
 
       switch (game.player.score) {
-        case 10:
-          game.dropInterval = 600;
+        case 8:
+          game.dropInterval = 500;
+          break;
+
+        case 20:
+          game.dropInterval = 300;
           break;
 
         case 40:
-          game.dropInterval = 400;
-          break;
-
-        case 70:
-          game.dropInterval = 200;
+          game.dropInterval = 150;
           break;
 
         default:
@@ -616,9 +635,12 @@ document.addEventListener("DOMContentLoaded", () => {
   context.strokeStyle = "#142143";
   context.lineWidth = 0.2;
   context.strokeText("ENTER to play!", 1.6, 6);
+  context.strokeText("TAB: toggle shadow", 0.6, 8);
   context.font = "1px Arial, Helvetica, sans-serif";
-  context.fillStyle = "#BECEEF";
+  context.fillStyle = "#F6F8F8";
   context.fillText("ENTER to play!", 1.6, 6);
+  context.fillText("TAB: toggle shadow", 0.6, 8);
+
 
   gameView.bindControls();
 });
@@ -684,7 +706,9 @@ class Piece {
         ];
       case "1":
         return [
-          [8]
+          [0, 0, 0],
+          [0, 8, 0],
+          [0, 0, 0]
         ];
       case "2":
         return [

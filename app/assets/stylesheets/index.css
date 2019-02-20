@@ -23,6 +23,7 @@ body {
 
 #canvas {
   border: 10px solid #142143;
+  transition: all 1s ease-out;
 }
 
 #next-piece {
@@ -33,18 +34,22 @@ body {
 .instructions-score {
   width: 200px;
   margin-right: 50px;
+  color: #142143;
+  transition: all 1s ease-out;
 }
 
 .instructions-score h1 {
   margin-bottom: 20px;
   margin-left: -30px;
-  color: #BECEEF;
-  font-size: 15px;
+  color: #142143;
+  font-size: 17px;
+  transition: all 1s ease-out;
 }
 
 .instructions-score h2 {
   margin-top: -10px;
   margin-bottom: -1px;
+  transition: all 1s ease-out;
 }
 
 .instructions {
@@ -53,6 +58,15 @@ body {
   flex-direction: column;
   padding: 10px;
   font-weight: 900;
+  color: #142143;
+}
+
+.control {
+  transition: all 1s ease-out;
+}
+
+.instructions:hover .control {
+  color: #F6F8F8;
 }
 
 .arrow-controls {
@@ -76,9 +90,19 @@ body {
   list-style: none;
   font-size: 60px;
   margin-bottom: 20px;
+  transition: all 1s ease-out;
+}
+
+.links-list li:last-child {
+  font-size: 56px;
 }
 
 .links-list a {
   text-decoration: none;
   color: #BECEEF;
+}
+
+.links-list li:hover {
+  transform: rotate(-180deg);
+  margin-right: -40px;
 }
