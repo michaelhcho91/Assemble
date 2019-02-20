@@ -119,7 +119,7 @@ class Game {
       )
     ];
     this.paused = false;
-    this.wantShadow = false;
+    this.wantShadow = true;
   }
 
   autoDrop(time = 0) {
@@ -158,7 +158,11 @@ class Game {
       }
     }
 
-    this.player.score += rowsCleared;
+    if (this.wantShadow) {
+      this.player.score += rowsCleared * (rowsCleared * 1000);
+    } else {
+      this.player.score += rowsCleared * (rowsCleared * 2000);
+    }
   }
 
   createBoard(width, height) {
@@ -647,11 +651,9 @@ document.addEventListener("DOMContentLoaded", () => {
   context.strokeStyle = "#142143";
   context.lineWidth = 0.2;
   context.strokeText("ENTER to play!", 1.6, 6);
-  context.strokeText("TAB: toggle shadow", 0.6, 8);
   context.font = "1px Arial, Helvetica, sans-serif";
   context.fillStyle = "#F6F8F8";
   context.fillText("ENTER to play!", 1.6, 6);
-  context.fillText("TAB: toggle shadow", 0.6, 8);
 
 
   gameView.bindControls();
