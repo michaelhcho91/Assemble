@@ -108,7 +108,7 @@ class Game {
 
     this.board = this.createBoard(10, 20);
     this.startTime = 0;
-    this.dropInterval = 700;
+    this.dropInterval = 800;
     this.gameOver = false;
     this.isPlaying = false;
     this.lastTime = 0;
@@ -159,9 +159,9 @@ class Game {
     }
 
     if (this.wantShadow) {
-      this.player.score += rowsCleared * (rowsCleared * 1000);
+      this.player.score += Math.pow(rowsCleared, rowsCleared) * (rowsCleared * 1000);
     } else {
-      this.player.score += rowsCleared * (rowsCleared * 2000);
+      this.player.score += Math.pow(rowsCleared, rowsCleared) * (rowsCleared * 2000);
     }
   }
 
@@ -544,21 +544,16 @@ class GameView {
       
       if (game.paused) return;
 
-      switch (game.player.score) {
-        case 8:
-          game.dropInterval = 500;
-          break;
-
-        case 20:
-          game.dropInterval = 300;
-          break;
-
-        case 40:
-          game.dropInterval = 150;
-          break;
-
-        default:
-          break;
+      if (game.player.score > 500000 && game.player.score < 1000000) {
+        game.dropInterval = 700;
+      } else if (game.player.score > 2000000 && game.player.score < 4000000) {
+        game.dropInterval = 500;
+      } else if (game.player.score > 5000000 && game.player.score < 7000000) {
+        game.dropInterval = 300;
+      } else if (game.player.score > 8000000 && game.player.score < 10000000) {
+        game.dropInterval = 150;
+      } else if (game.player.score > 10000000) {
+        game.dropInterval = 50;
       }
     } else {
       game.draw(this.canvas);
