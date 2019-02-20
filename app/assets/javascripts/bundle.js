@@ -235,19 +235,16 @@ class Game {
   generateNextPiece() {
     const player = this.player;
     const piece = new _piece__WEBPACK_IMPORTED_MODULE_0__["default"]();
-    const shape = SHAPES[
-      Math.floor(SHAPES.length * Math.random())
-    ];
+    const queue = this.nextPieceArray;
 
-    // this.nextPieceArray.push(piece.createPiece(shape)); // generate new nextPiece
-
-    let ready = false;
-    while (!ready) {
+    for (let i = 0; queue.length <= 4; i++) {
+      const shape = SHAPES[
+        Math.floor(SHAPES.length * Math.random())
+      ];
       const newPiece = piece.createPiece(shape);
 
-      if (!this.nextPieceArray.includes(newPiece)) {
-        this.nextPieceArray.push(newPiece);
-        ready = true;
+      if (this.isUnique(newPiece)) {
+        queue.push(newPiece);
       }
     }
     
@@ -264,7 +261,7 @@ class Game {
       gameover.play();
     }
   }
-  
+
   hardDrop() {
     const player = this.player;
     
@@ -304,6 +301,21 @@ class Game {
     return false;
   }
 
+  isUnique(piece) {
+    const queue = this.nextPieceArray;
+
+    let result;
+    for (let i = 0; i < queue.length; i++) {
+      if (JSON.stringify(piece) === JSON.stringify(queue[i])) {
+        result = false;
+      } else {
+        result = true;
+      }
+    }
+
+    return result;
+  }
+  
   manualDrop() {
     const player = this.player;
     if (this.paused) return;
@@ -801,9 +813,11 @@ class Player {
     }
 
     if (direction > 0) { // rotate other direction
-    matrix.forEach(row => row.reverse());
+      matrix.forEach(row => {
+        row.reverse();
+      });
     } else {
-    matrix.reverse();
+      matrix.reverse();
     }
   }
 }
