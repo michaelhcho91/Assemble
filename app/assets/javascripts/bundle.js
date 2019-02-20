@@ -158,6 +158,10 @@ class Game {
       }
     }
 
+    if (board.forEach(row => row.every(el => el == 0))) {
+      rowsCleared *= 10;
+    }
+
     if (this.wantShadow) {
       this.player.score += Math.pow(rowsCleared, rowsCleared) * (rowsCleared * 1000);
     } else {
@@ -296,9 +300,6 @@ class Game {
   }
   
   isCollided(piece, position) {
-    // const piece = this.player.matrix;
-    // const position = player.position;
-
     for (let y = 0; y < piece.length; y++) {
       for (let x = 0; x < piece[0].length; x++) {
         if (piece[y][x] !== 0) {
@@ -394,7 +395,7 @@ class Game {
     player.transpose(matrix, direction);
     
     let offset = 1;
-    while (this.isCollided(player.matrix, player.position)) {
+    while (this.isCollided(matrix, position)) {
       position.x += offset;
 
       if (offset > 0) {
@@ -460,7 +461,6 @@ class GameView {
       switch (e.keyCode) {
         case 13: // enter to start
           e.preventDefault();
-
           if (!game.isPlaying || game.gameOver) {
             game.gameOver = false;
             game.start(this);
@@ -469,7 +469,6 @@ class GameView {
           
         case 80: // p for pause
           e.preventDefault();
-          
           if (game.paused) {
             game.start(this);
             game.paused = false;
@@ -480,14 +479,12 @@ class GameView {
 
         case 77: // m for mute
           e.preventDefault();
-
           game.playMusic();
           break;
         
         case 37: // left
         case 65: // A
           e.preventDefault();
-
           if (!game.paused && !game.gameOver) {
             game.moveLat(-1);
           }
@@ -496,7 +493,6 @@ class GameView {
         case 39: // right
         case 68: // D
           e.preventDefault();
-
           if (!game.paused && !game.gameOver) {
             game.moveLat(1);
           }
@@ -505,7 +501,6 @@ class GameView {
         case 40: // down
         case 83: // S
           e.preventDefault();
-
           if (!game.paused && !game.gameOver) {
             game.manualDrop();
           }
@@ -514,16 +509,14 @@ class GameView {
         case 16: // SHIFT
         case 38: // up
           e.preventDefault();
-
           if (!game.paused && !game.gameOver) {
             game.rotate(1);
           }
           break;
 
         case 87: // W
-        case 90: // Z for other direction
+        case 90: // Z
           e.preventDefault();
-
           if (!game.paused && !game.gameOver) {
             game.rotate(-1);
           }
@@ -531,7 +524,6 @@ class GameView {
 
         case 32: // space for hard drop
           e.preventDefault();
-
           if (!game.paused && game.isPlaying) {
             game.hardDrop();
           }
@@ -539,7 +531,6 @@ class GameView {
 
         case 9: // tab for shadow
           e.preventDefault();
-
           if (game.wantShadow && game.isPlaying) {
             game.wantShadow = false;
           } else {
@@ -559,7 +550,7 @@ class GameView {
     if (!game.gameOver) {
       game.draw(this.canvas);
       game.autoDrop(time);
-      
+
       if (game.paused) return;
 
       game.increaseDifficulty();
@@ -655,7 +646,6 @@ document.addEventListener("DOMContentLoaded", () => {
   context.fillStyle = "#F6F8F8";
   context.fillText("ENTER to play!", 1.6, 6);
 
-
   gameView.bindControls();
 });
 
@@ -671,9 +661,6 @@ document.addEventListener("DOMContentLoaded", () => {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 class Piece {
-  constructor() {
-  }
-  
   createPiece(shape) {
     switch (shape) {
       case "T":

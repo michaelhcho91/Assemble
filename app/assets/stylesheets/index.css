@@ -31,6 +31,13 @@ body {
   margin-bottom: 20px;
 }
 
+.high-scores {
+  border: 5px solid #BECEEF;
+  height: 400px;
+  width: 150px;
+  margin-right: 50px;
+}
+
 .instructions-score {
   width: 200px;
   margin-right: 50px;
