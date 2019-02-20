@@ -71,14 +71,14 @@ The difficulty is determined by how fast the piece falls. The rate of the fall i
 
 ```javascript
 switch (score) {
-  case 10:
-    dropInterval = 600;
+  case 8:
+    dropInterval = 500;
     break;
-  case 40:
-    dropInterval = 400;
+  case 20:
+    dropInterval = 300;
     break;
-  case 70:
-    dropInterval = 200;
+  case 50:
+    dropInterval = 150;
     break;
   default:
     break;
