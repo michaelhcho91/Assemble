@@ -211,11 +211,16 @@ class Game {
     const shadowPlayer = JSON.parse(JSON.stringify(this.player));
 
     // return shadowPlayer;
-    // while (!this.isCollided(this.board, shadowPlayer.position)) {
-    //   shadowPlayer.position.y++;
-    // }
+    let set = false;
+    while (!set) {
+      shadowPlayer.position = position;
+      shadowPlayer.position.y++;
+      if (this.isCollided(matrix, position)) {
+        set = true;
+      }
+    }
 
-    // shadowPlayer.position.y--;
+    shadowPlayer.position.y--;
   }
 
   generateNextPiece() {
@@ -611,7 +616,6 @@ document.addEventListener("DOMContentLoaded", () => {
   context.strokeStyle = "#142143";
   context.lineWidth = 0.2;
   context.strokeText("ENTER to play!", 1.6, 6);
-
   context.font = "1px Arial, Helvetica, sans-serif";
   context.fillStyle = "#BECEEF";
   context.fillText("ENTER to play!", 1.6, 6);
