@@ -126,11 +126,13 @@ class Game {
     const board = this.board;
     const newRow = new Array(10).fill(8);
 
-    board.shift();
-    newRow[
-      Math.floor(Math.random() * 10)
-    ] = 0;
-    board.push(newRow);
+    setTimeout(() => {
+      board.shift();
+      newRow[
+        Math.floor(Math.random() * 10)
+      ] = 0;
+      board.push(newRow);
+    }, 1000);
   }
 
   autoDrop(time = 0) {
