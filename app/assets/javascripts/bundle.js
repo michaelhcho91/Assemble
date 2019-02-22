@@ -118,6 +118,7 @@ class Game {
         SHAPES[Math.floor(Math.random() * SHAPES.length)]
       )
     ];
+    this.nextScore = 100000;
     this.paused = false;
     this.wantShadow = true;
   }
@@ -132,7 +133,7 @@ class Game {
         Math.floor(Math.random() * 10)
       ] = 0;
       board.push(newRow);
-    }, 1000);
+    }, 2000);
   }
 
   autoDrop(time = 0) {
@@ -298,46 +299,13 @@ class Game {
 
   increaseDifficulty() {
     const player = this.player;
+    const interval = this.dropInterval - 50;
 
-    if (player.score > 50000 && player.score < 100000) {
-      if (this.dropInterval !== 750) {
-        this.dropInterval = 750;
+    if (player.score >= this.nextScore) {
+      if (this.dropInterval !== interval && this.dropInterval > 100) {
+        this.dropInterval -= 50;
         this.addRow();
-      }
-    } else if (player.score > 100000 && player.score < 300000) {
-      if (this.dropInterval !== 700) {
-        this.dropInterval = 700;
-        this.addRow();
-      }
-    } else if (player.score > 400000 && player.score < 600000) {
-      if (this.dropInterval !== 600) {
-        this.dropInterval = 600;
-        this.addRow();
-      }
-    } else if (player.score > 700000 && player.score < 900000) {
-      if (this.dropInterval !== 500) {
-        this.dropInterval = 500;
-        this.addRow();
-      }
-    } else if (player.score > 1000000 && player.score < 1200000) {
-      if (this.dropInterval !== 400) {
-        this.dropInterval = 400;
-        this.addRow();
-      }
-    } else if (player.score > 1300000 && player.score < 1500000) {
-      if (this.dropInterval !== 300) {
-        this.dropInterval = 300;
-        this.addRow();
-      }
-    } else if (player.score > 1600000 && player.score < 1800000) {
-      if (this.dropInterval !== 200) {
-        this.dropInterval = 200;
-        this.addRow();
-      }
-    } else if (player.score > 1900000 && player.score < 2100000) {
-      if (this.dropInterval !== 100) {
-        this.dropInterval = 100;
-        this.addRow();
+        this.nextScore += 100000;
       }
     }
   }
@@ -428,6 +396,7 @@ class Game {
     this.startTime = 0;
     this.dropInterval = 800;
     this.player.resetScore();
+    this.nextScore = 100000;
   }
   
   rotate(direction) {
