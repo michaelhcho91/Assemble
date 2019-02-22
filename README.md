@@ -87,9 +87,8 @@ switch (score) {
 
 # Technologies
 
-Development technologies for `Assemble!` include HTML5 Canvas and vanilla Javascript.
+Development technologies for `Assemble!` include HTML5 Canvas and vanilla JavaScript.
 
 # Future Implementations
 
 * Another canvas to render a piece to be held.
-* A preview of the position the active piece would be if it was dropped.
