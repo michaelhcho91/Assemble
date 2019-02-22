@@ -98,7 +98,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _piece__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./piece */ "./lib/piece.js");
 
 
-const SHAPES = "IJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOT123"; // lower chance for 123
+const SHAPES = "IJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOT123"; // lower chance for 123
 
 class Game {
   constructor(player, context, previewCtx) {
@@ -120,6 +120,17 @@ class Game {
     ];
     this.paused = false;
     this.wantShadow = true;
+  }
+
+  addRow() {
+    const board = this.board;
+    const newRow = new Array(10).fill(8);
+
+    board.shift();
+    newRow[
+      Math.floor(Math.random() * 10)
+    ] = 0;
+    board.push(newRow);
   }
 
   autoDrop(time = 0) {
@@ -159,13 +170,13 @@ class Game {
     }
 
     if (board.forEach(row => row.every(el => el == 0))) {
-      rowsCleared *= 10;
+      rowsCleared *= 100;
     }
 
     if (this.wantShadow) {
-      this.player.score += Math.pow(rowsCleared, rowsCleared) * (rowsCleared * 1000);
+      this.player.score += Math.pow(rowsCleared, 2) * (rowsCleared * 1000);
     } else {
-      this.player.score += Math.pow(rowsCleared, rowsCleared) * (rowsCleared * 2000);
+      this.player.score += Math.pow(rowsCleared, 3) * (rowsCleared * 2000);
     }
   }
 
@@ -286,16 +297,46 @@ class Game {
   increaseDifficulty() {
     const player = this.player;
 
-    if (player.score > 500000 && player.score < 1000000) {
-      this.dropInterval = 700;
-    } else if (player.score > 2000000 && player.score < 4000000) {
-      this.dropInterval = 500;
-    } else if (player.score > 5000000 && player.score < 7000000) {
-      this.dropInterval = 300;
-    } else if (player.score > 8000000 && player.score < 10000000) {
-      this.dropInterval = 150;
-    } else if (player.score > 10000000) {
-      this.dropInterval = 50;
+    if (player.score > 50000 && player.score < 100000) {
+      if (this.dropInterval !== 750) {
+        this.dropInterval = 750;
+        this.addRow();
+      }
+    } else if (player.score > 100000 && player.score < 300000) {
+      if (this.dropInterval !== 700) {
+        this.dropInterval = 700;
+        this.addRow();
+      }
+    } else if (player.score > 400000 && player.score < 600000) {
+      if (this.dropInterval !== 600) {
+        this.dropInterval = 600;
+        this.addRow();
+      }
+    } else if (player.score > 700000 && player.score < 900000) {
+      if (this.dropInterval !== 500) {
+        this.dropInterval = 500;
+        this.addRow();
+      }
+    } else if (player.score > 1000000 && player.score < 1200000) {
+      if (this.dropInterval !== 400) {
+        this.dropInterval = 400;
+        this.addRow();
+      }
+    } else if (player.score > 1300000 && player.score < 1500000) {
+      if (this.dropInterval !== 300) {
+        this.dropInterval = 300;
+        this.addRow();
+      }
+    } else if (player.score > 1600000 && player.score < 1800000) {
+      if (this.dropInterval !== 200) {
+        this.dropInterval = 200;
+        this.addRow();
+      }
+    } else if (player.score > 1900000 && player.score < 2100000) {
+      if (this.dropInterval !== 100) {
+        this.dropInterval = 100;
+        this.addRow();
+      }
     }
   }
   
@@ -383,7 +424,7 @@ class Game {
   reset() {
     this.gameOver = false;
     this.startTime = 0;
-    this.dropInterval = 700;
+    this.dropInterval = 800;
     this.player.resetScore();
   }
   
