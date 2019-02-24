@@ -98,7 +98,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _piece__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./piece */ "./lib/piece.js");
 
 
-const SHAPES = "IJLSZOTIJLT123";
+const SHAPES = "IJLSZOTIJLTIJLSZOTIJLTIJLSZOTIJLT123";
 
 class Game {
   constructor(player, context, previewCtx) {
