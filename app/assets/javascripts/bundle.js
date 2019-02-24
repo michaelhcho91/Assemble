@@ -98,7 +98,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _piece__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./piece */ "./lib/piece.js");
 
 
-const SHAPES = "IJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOTIJLSZOT123"; // lower chance for 123
+const SHAPES = "IJLSZOTIJLT123";
 
 class Game {
   constructor(player, context, previewCtx) {
@@ -339,20 +339,18 @@ class Game {
     const queue = this.nextPieceArray;
 
     let result;
-    for (let i = 0; i < queue.length; i++) {
-      if (JSON.stringify(piece) === JSON.stringify(queue[i])) {
-        result = false;
-      } else {
-        result = true;
-      }
+    if (queue.some(el => JSON.stringify(el) === JSON.stringify(piece))) {
+      result = false;
+    } else {
+      result = true;
     }
-
+    
     return result;
   }
   
   manualDrop() {
-    const player = this.player;
     if (this.paused) return;
+    const player = this.player;
     
     player.position.y++;
 
