@@ -376,17 +376,19 @@ class Game {
     }
   }
 
+  pauseMusic() {
+    const audio = document.getElementById("bg-music");
+
+    audio.pause();
+    this.musicPlaying = false;
+  }
+  
   playMusic() {
     const audio = document.getElementById("bg-music");
 
-    if (this.musicPlaying) {
-      audio.pause();
-      this.musicPlaying = false;
-    } else {
-      audio.volume = 0.3;
-      audio.play();
-      this.musicPlaying = true;
-    }
+    audio.volume = 0.3;
+    audio.play();
+    this.musicPlaying = true;
   }
 
   reset() {
@@ -395,6 +397,14 @@ class Game {
     this.dropInterval = 800;
     this.player.resetScore();
     this.nextScore = 50000;
+  }
+
+  restart(gameView) {
+    this.reset();
+    this.board = this.createBoard(10, 20);
+    this.paused = false;
+    this.isPlaying = true;
+    gameView.update();
   }
   
   rotate(direction) {
@@ -430,16 +440,9 @@ class Game {
   }
 
   start(gameView) {
-    if (!this.gameOver && !this.paused) {
-      this.board = this.createBoard(10, 20);
-      this.reset();
-      this.isPlaying = true;
-      this.playMusic();
-      gameView.update();
-    } else if (this.paused) {
-      this.paused = false;
-      gameView.update();
-    }
+    this.isPlaying = true;
+    this.playMusic();
+    gameView.update();
   }
 }
 
@@ -471,9 +474,12 @@ class GameView {
       switch (e.keyCode) {
         case 13: // enter to start
           e.preventDefault();
-          if (!game.isPlaying || game.gameOver) {
+          if (!game.isPlaying && !game.gameOver) {
             game.gameOver = false;
             game.start(this);
+          } else if (game.gameOver) {
+            game.gameOver = false;
+            game.restart(this);
           }
           break;
           
@@ -489,7 +495,11 @@ class GameView {
 
         case 77: // m for mute
           e.preventDefault();
-          game.playMusic();
+          if (game.musicPlaying) {
+            game.pauseMusic();
+          } else {
+            game.playMusic();
+          }
           break;
         
         case 37: // left
