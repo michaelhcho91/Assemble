@@ -179,7 +179,7 @@ class Game {
     if (this.wantShadow) {
       this.player.score += Math.pow(rowsCleared, 2) * (rowsCleared * 1000);
     } else {
-      this.player.score += Math.pow(rowsCleared, 3) * (rowsCleared * 2000);
+      this.player.score += Math.pow(rowsCleared, 2) * (rowsCleared * 2000);
     }
   }
 
