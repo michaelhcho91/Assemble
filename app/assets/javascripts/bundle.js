@@ -118,7 +118,7 @@ class Game {
         SHAPES[Math.floor(Math.random() * SHAPES.length)]
       )
     ];
-    this.nextScore = 50000;
+    this.nextScore = 100000;
     this.paused = false;
     this.wantShadow = true;
   }
@@ -305,7 +305,7 @@ class Game {
       if (this.dropInterval !== interval && this.dropInterval > 100) {
         this.dropInterval -= 50;
         this.addRow();
-        this.nextScore += 50000;
+        this.nextScore += 100000;
       }
     }
   }
@@ -396,7 +396,7 @@ class Game {
     this.startTime = 0;
     this.dropInterval = 800;
     this.player.resetScore();
-    this.nextScore = 50000;
+    this.nextScore = 100000;
   }
 
   restart(gameView) {
