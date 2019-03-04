@@ -98,7 +98,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _piece__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./piece */ "./lib/piece.js");
 
 
-const SHAPES = "IJLSZOTIJLTIJLSZOTIJLTIJLSZOTIJLT123";
+const SHAPES = "IJLSZOTNIJLTIJLSZOTIJLTIJLSZOTIJLTN123";
 
 class Game {
   constructor(player, context, previewCtx) {
@@ -683,6 +683,12 @@ __webpack_require__.r(__webpack_exports__);
 class Piece {
   createPiece(shape) {
     switch (shape) {
+      case "N":
+        return [
+          [11, 0, 11],
+          [11, 11, 11],
+          [0, 0, 0]
+        ];
       case "T":
         return [
           [0, 1, 0],
@@ -772,7 +778,8 @@ const COLORS = [
   "pink", // Z
   "black", // 1
   "white", // 2
-  "silver" // 3
+  "silver", // 3
+  "brown", // N
 ];
 
 class Player {
