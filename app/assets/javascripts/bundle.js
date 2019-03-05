@@ -98,7 +98,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _piece__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./piece */ "./lib/piece.js");
 
 
-const SHAPES = "IJLSZOTIJLTIJLSZOTIJLTIJLSZOTIJLTN123";
+const SHAPES = "IJLSZOTIJLTIJLSZOTIJLTIJLSZOTIJLTVN123";
 
 class Game {
   constructor(player, context, previewCtx) {
@@ -468,7 +468,7 @@ class GameView {
     const game = this.game;
     
     document.addEventListener("keydown", (e) => {
-      switch (e.keyCode) {
+      switch (e.which) {
         case 13: // enter to start
           e.preventDefault();
           if (!game.isPlaying && !game.gameOver) {
@@ -680,6 +680,11 @@ __webpack_require__.r(__webpack_exports__);
 class Piece {
   createPiece(shape) {
     switch (shape) {
+      case "V":
+        return [
+          [12, 12],
+          [0, 12]
+        ];
       case "N":
         return [
           [11, 0, 11],
@@ -777,6 +782,7 @@ const COLORS = [
   "white", // 2
   "silver", // 3
   "brown", // N
+  "navy" // V
 ];
 
 class Player {
