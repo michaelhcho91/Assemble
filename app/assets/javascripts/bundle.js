@@ -483,8 +483,8 @@ class GameView {
         case 80: // p for pause
           e.preventDefault();
           if (game.paused) {
-            game.start(this);
             game.paused = false;
+            game.start(this);
           } else {
             game.paused = true;
           }
