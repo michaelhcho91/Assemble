@@ -42,7 +42,6 @@ body {
   width: 200px;
   margin-right: 50px;
   color: #142143;
-  transition: all 1s ease-out;
 }
 
 .instructions-score h1 {
@@ -50,13 +49,11 @@ body {
   margin-left: -30px;
   color: #142143;
   font-size: 17px;
-  transition: all 1s ease-out;
 }
 
 .instructions-score h2 {
   margin-top: -10px;
   margin-bottom: -1px;
-  transition: all 1s ease-out;
 }
 
 .instructions {
@@ -66,10 +63,6 @@ body {
   padding: 10px;
   font-weight: 900;
   color: #142143;
-}
-
-.control {
-  transition: all 1s ease-out;
 }
 
 .instructions:hover .control {
