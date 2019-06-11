@@ -6,6 +6,10 @@ Assemble is a simple browser game based on Tetris, where the pieces are the colo
 
 ![](./app/assets/images/assemble-ss.png)
 
+# Technologies
+
+Development technologies for `Assemble!` include HTML5 Canvas and vanilla JavaScript.
+
 # Feature highlights
 
 ## Rotating
@@ -84,10 +88,6 @@ switch (score) {
     break;
 }
 ```
-
-# Technologies
-
-Development technologies for `Assemble!` include HTML5 Canvas and vanilla JavaScript.
 
 # Future Implementations
 
